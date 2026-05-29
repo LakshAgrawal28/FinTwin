@@ -21,14 +21,17 @@ router.post('/', async (req, res) => {
 4. One sentence of honest encouragement
 Keep total response under 200 words.`;
 
+    const lastYearIndex = (simulationResult?.yearlyPercentiles?.length || 1) - 1;
+    const lastYear = simulationResult?.yearlyPercentiles?.[lastYearIndex];
+
     const userMessage = `User archetype: ${twinState?.archetype || 'Unknown'}
 Monthly income: ₹${userProfile?.income || 0}
 Monthly expenses: ₹${Number(userProfile?.expenses || 0) + Number(userProfile?.variableSpend || 0) + Number(userProfile?.emi || 0)}
 Portfolio value: ₹${userProfile?.portfolioValue || 0}
 Scenario run: ${simulationResult?.scenarioName || simulationResult?.scenarioKey || 'Custom'}
-Median outcome at year 10: ₹${simulationResult?.yearlyPercentiles?.[10]?.p50 || 0}
-Worst case at year 10: ₹${simulationResult?.yearlyPercentiles?.[10]?.p10 || 0}
-Best case at year 10: ₹${simulationResult?.yearlyPercentiles?.[10]?.p90 || 0}
+Median outcome at year ${lastYearIndex}: ₹${lastYear?.p50 || 0}
+Worst case at year ${lastYearIndex}: ₹${lastYear?.p10 || 0}
+Best case at year ${lastYearIndex}: ₹${lastYear?.p90 || 0}
 Danger zone months: ${simulationResult?.dangerZoneMonths || 0}`;
 
     // Use a custom writer that wraps each chunk in SSE format

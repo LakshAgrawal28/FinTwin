@@ -24,7 +24,7 @@ const StreamingInsight = ({ userProfile, twinState, simulationResult }) => {
     
     try {
       // Clean up base URL to handle trailing slashes
-      const baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+      const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '');
       const apiUrl = `${baseUrl}/api/insight`;
 
       const response = await fetch(apiUrl, {
