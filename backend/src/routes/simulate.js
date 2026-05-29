@@ -51,7 +51,7 @@ function runNewMonteCarlo(params) {
       const yearNum = Math.floor(m / 12);
       majorExpenses.forEach(exp => {
         if (exp.year === yearNum && m % 12 === 0) {
-          portfolio = Math.max(0, portfolio - exp.amount);
+          portfolio = portfolio - exp.amount;
         }
       });
 
