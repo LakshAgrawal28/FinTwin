@@ -5,11 +5,39 @@ const router = Router();
 
 router.post('/', async (req, res, next) => {
   try {
-    const { portfolio } = req.body;
+    const { portfolio, customTargets, profile } = req.body;
     if (!portfolio || !Array.isArray(portfolio)) return res.json([]);
 
-    const TARGETS = { Equity: 0.65, Debt: 0.30, Gold: 0.05, Crypto: 0.0 };
+    // Calculate dynamic Targets based on custom input, profile drive, or defaults
+    let TARGETS = { Equity: 0.65, Debt: 0.30, Gold: 0.05, Crypto: 0.0 };
     
+    if (customTargets && typeof customTargets === 'object') {
+      TARGETS = {
+        Equity: Number(customTargets.Equity ?? 65) / 100,
+        Debt: Number(customTargets.Debt ?? 30) / 100,
+        Gold: Number(customTargets.Gold ?? 5) / 100,
+        Crypto: Number(customTargets.Crypto ?? 0) / 100
+      };
+    } else if (profile) {
+      const age = Number(profile.age) || 30;
+      const drive = profile.emotionalChoice || 'Balance';
+      
+      let eq = (100 - age) / 100;
+      let gold = 0.05;
+      
+      if (drive === 'Security') {
+        eq = Math.max(0.1, eq - 0.15);
+      } else if (drive === 'Growth') {
+        eq = Math.min(0.9, eq + 0.15);
+      } else if (drive === 'Independence') {
+        eq = Math.min(0.85, eq + 0.10);
+      }
+      
+      let debt = Math.max(0, 1.0 - eq - gold);
+      
+      TARGETS = { Equity: eq, Debt: debt, Gold: gold, Crypto: 0.0 };
+    }
+
     let totalValue = portfolio.reduce((sum, item) => sum + item.currentValue, 0);
     
     const currentByType = { Equity: 0, Debt: 0, Gold: 0, Crypto: 0 };

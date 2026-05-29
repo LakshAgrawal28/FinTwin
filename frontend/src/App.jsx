@@ -5,6 +5,7 @@ import Simulator from './pages/Simulator';
 import InvestmentManager from './pages/InvestmentManager';
 import RebalanceAdvisor from './pages/RebalanceAdvisor';
 import Projections from './pages/Projections';
+import TaxOptimizer from './pages/TaxOptimizer';
 import Navbar from './components/layout/Navbar';
 
 function AppContent() {
@@ -21,6 +22,7 @@ function AppContent() {
         <Route path="/investments" element={<InvestmentManager />} />
         <Route path="/rebalance" element={<RebalanceAdvisor />} />
         <Route path="/projections" element={<Projections />} />
+        <Route path="/tax" element={<TaxOptimizer />} />
       </Routes>
     </>
   );

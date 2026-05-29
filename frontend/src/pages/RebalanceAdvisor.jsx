@@ -12,17 +12,19 @@ export default function RebalanceAdvisor() {
   const rawPortfolio = useTwinStore(state => state.portfolio);
   const rawRebalanceActions = useTwinStore(state => state.rebalanceActions);
   const setRebalanceActions = useTwinStore(state => state.setRebalanceActions);
+  const customTargets = useTwinStore(state => state.customTargets);
+  const userProfile = useTwinStore(state => state.userProfile);
 
   const portfolio = useMemo(() => rawPortfolio || [], [rawPortfolio]);
   const rebalanceActions = useMemo(() => rawRebalanceActions || [], [rawRebalanceActions]);
 
   useEffect(() => {
-    if (rebalanceActions.length === 0 && portfolio.length > 0) {
-      postRebalance(portfolio).then(res => {
+    if (portfolio.length > 0) {
+      postRebalance(portfolio, customTargets, userProfile).then(res => {
         if (res) setRebalanceActions(res);
       }).catch(console.error);
     }
-  }, [portfolio, rebalanceActions, setRebalanceActions]);
+  }, [portfolio, customTargets, userProfile, setRebalanceActions]);
 
   const totalSells = rebalanceActions.filter(a => a.action === 'SELL').reduce((s, a) => s + (a.amount || 0), 0);
   const totalBuys = rebalanceActions.filter(a => a.action === 'BUY').reduce((s, a) => s + (a.amount || 0), 0);

@@ -15,6 +15,8 @@ export default function InvestmentManager() {
   const userProfile = useTwinStore(state => state.userProfile);
   const healthScore = useTwinStore(state => state.healthScore);
   const setHealthScore = useTwinStore(state => state.setHealthScore);
+  const customTargets = useTwinStore(state => state.customTargets);
+  const setCustomTargets = useTwinStore(state => state.setCustomTargets);
   
   const portfolio = useMemo(() => rawPortfolio || [], [rawPortfolio]);
 
@@ -59,15 +61,62 @@ export default function InvestmentManager() {
   ].filter(a => a.value > 0);
 
   const age = Number(userProfile?.age) || 30;
-  const recEquity = Math.max(0, 100 - age);
-  const recDebt = Math.max(0, 100 - recEquity - 5); // 5% for gold
-  
-  const recommendedAlloc = [
-    { name: 'Equity', value: recEquity, color: '#8B7FFF' },
-    { name: 'Debt', value: recDebt, color: '#00E5B8' },
-    { name: 'Gold', value: 5, color: '#F5A623' },
-    { name: 'Crypto', value: 0, color: '#FF4D4D' }
-  ];
+  const drive = userProfile?.emotionalChoice || 'Balance';
+
+  // Calculate default targets adjusted for risk drive
+  let defaultEquity = Math.max(10, 100 - age);
+  let defaultGold = 5;
+
+  if (drive === 'Security') {
+    defaultEquity = Math.max(10, defaultEquity - 15);
+  } else if (drive === 'Growth') {
+    defaultEquity = Math.min(90, defaultEquity + 15);
+  } else if (drive === 'Independence') {
+    defaultEquity = Math.min(85, defaultEquity + 10);
+  }
+
+  const defaultDebt = Math.max(5, 100 - defaultEquity - defaultGold);
+
+  const targets = useMemo(() => {
+    if (customTargets) return customTargets;
+    return { Equity: defaultEquity, Debt: defaultDebt, Gold: defaultGold, Crypto: 0 };
+  }, [customTargets, defaultEquity, defaultDebt, defaultGold]);
+
+  const recommendedAlloc = useMemo(() => [
+    { name: 'Equity', value: targets.Equity, color: '#8B7FFF' },
+    { name: 'Debt', value: targets.Debt, color: '#00E5B8' },
+    { name: 'Gold', value: targets.Gold, color: '#F5A623' },
+    { name: 'Crypto', value: targets.Crypto, color: '#FF4D4D' }
+  ], [targets]);
+
+  const handleTargetChange = (assetClass, newValue) => {
+    const clampedValue = Math.max(0, Math.min(100, newValue));
+    const otherClasses = Object.keys(targets).filter(c => c !== assetClass);
+    const sumOthers = otherClasses.reduce((sum, c) => sum + targets[c], 0);
+    const remaining = 100 - clampedValue;
+
+    const newTargets = { ...targets };
+    newTargets[assetClass] = clampedValue;
+
+    if (sumOthers > 0) {
+      otherClasses.forEach(c => {
+        newTargets[c] = Math.round((targets[c] / sumOthers) * remaining);
+      });
+    } else {
+      otherClasses.forEach((c, idx) => {
+        newTargets[c] = idx === 0 ? remaining : 0;
+      });
+    }
+
+    const finalSum = Object.values(newTargets).reduce((a, b) => a + b, 0);
+    if (finalSum !== 100) {
+      const diff = 100 - finalSum;
+      const largestClass = otherClasses.find(c => newTargets[c] > 0) || otherClasses[0];
+      newTargets[largestClass] = Math.max(0, newTargets[largestClass] + diff);
+    }
+
+    setCustomTargets(newTargets);
+  };
 
   const riskMetrics = healthScore?.breakdown?.find(b => b.category === 'Asset Mix & Risk')?.metrics || 
                       { concentrationRisk: 30, volatilityRisk: 50, liquidityRisk: 20 };
@@ -229,6 +278,29 @@ export default function InvestmentManager() {
                 {currentAlloc.map(alloc => {
                   const rec = recommendedAlloc.find(r => r.name === alloc.name)?.value || 0;
                   return <Badge key={alloc.name} type={alloc.name.toLowerCase()} label={`${alloc.name.substring(0,2)}: ${alloc.value}% → ${rec}%`} />
+                })}
+              </div>
+
+              {/* Interactive sliders */}
+              <div className="mt-6 border-t border-white/5 pt-6 space-y-4">
+                <h4 className="text-[12px] font-bold text-[#EEF2FF] uppercase tracking-wider">Customize Target Allocation</h4>
+                {Object.keys(targets).map(asset => {
+                  const val = targets[asset];
+                  const color = asset === 'Equity' ? '#8B7FFF' : asset === 'Debt' ? '#00E5B8' : asset === 'Gold' ? '#F5A623' : '#FF4D4D';
+                  return (
+                    <div key={asset} className="space-y-1">
+                      <div className="flex justify-between text-[11px] font-semibold">
+                        <span style={{ color }}>{asset} Target</span>
+                        <span className="text-[#EEF2FF]">{val}%</span>
+                      </div>
+                      <input 
+                        type="range" min="0" max="100" step="1"
+                        value={val} onChange={e => handleTargetChange(asset, Number(e.target.value))}
+                        className="w-full h-1 bg-gray-800 rounded appearance-none cursor-pointer"
+                        style={{ accentColor: color }}
+                      />
+                    </div>
+                  );
                 })}
               </div>
             </div>

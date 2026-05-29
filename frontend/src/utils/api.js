@@ -70,8 +70,8 @@ export const postPortfolio = async (profile) => {
   return response.data;
 };
 
-export const postRebalance = async (portfolio) => {
-  const response = await api.post('/api/rebalance', { portfolio });
+export const postRebalance = async (portfolio, customTargets, profile) => {
+  const response = await api.post('/api/rebalance', { portfolio, customTargets, profile });
   return response.data;
 };
 

@@ -65,6 +65,12 @@ const Navbar = () => {
         <line x1="12" x2="12" y1="20" y2="4" />
         <line x1="6" x2="6" y1="20" y2="14" />
       </svg>
+    ),
+    Tax: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2v20" />
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+      </svg>
     )
   };
 
@@ -96,6 +102,9 @@ const Navbar = () => {
         </NavLink>
         <NavLink to="/rebalance" className={navItemClass}>
           {Icons.Rebalance} Rebalance
+        </NavLink>
+        <NavLink to="/tax" className={navItemClass}>
+          {Icons.Tax} Tax
         </NavLink>
         <NavLink to="/projections" className={navItemClass}>
           {Icons.Projections} Projections

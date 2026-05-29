@@ -12,6 +12,7 @@ const initialState = {
   goalsResult: null,
   isLoading: false,
   error: null,
+  customTargets: null,
 };
 
 export const useTwinStore = create(
@@ -41,6 +42,7 @@ export const useTwinStore = create(
       setGoalsResult: (result) => set({ goalsResult: result }),
       setLoading: (bool) => set({ isLoading: bool }),
       setError: (msg) => set({ error: msg }),
+      setCustomTargets: (targets) => set({ customTargets: targets }),
       resetAll: () => set(initialState),
     }),
     {
