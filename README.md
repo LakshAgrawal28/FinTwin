@@ -1,4 +1,4 @@
-# ⚡ FinTwin — Financial Digital Twin
+# FinTwin — Financial Digital Twin
 
 FinTwin is a state-of-the-art, responsive financial projection, planning, and simulation engine. It enables users to model their financial trajectory, analyze cash flow dynamics, map their risk archetype, simulate life scenarios (e.g., job loss, real-estate purchases, early retirement), and explore automatic portfolio rebalancing and tax optimization.
 
@@ -6,18 +6,18 @@ FinTwin is engineered to run in a hybrid model—utilizing **Groq/Gemini AI APIs
 
 ---
 
-## ✨ Features
+## Features
 
-- **📊 Personality Profiler**: Instantly classifies users into archetypes (*Debt Warrior*, *Impulsive Spender*, *Conservative Saver*, *Aggressive Grower*, *Disciplined Builder*, *Balanced Achiever*) using deterministic cash flow and savings algorithms.
-- **📈 Stochastic Monte Carlo Simulator**: Projects 10,000 randomized market paths (downside P10 to upside P90) based on asset class volatility weights, showcasing future net worth curves.
-- **🏡 Structured Milestone Goals**: Mathematical planners for Buying a House (with automated EMI warnings), Early Retirement (FIRE 30x rule), and Child Education (8% inflation-adjusted cost curve).
-- **🛡️ Smart Rebalancing**: Instantly compares current allocations with targets adjusted for age and risk tolerance. Generates step-by-step transaction check-off logs.
-- **💸 Tax Optimizer**: Exposes deductions and harvesting opportunities (Section 80C, 80D, NPS, and LTCG gains booking) based on tax slabs.
-- **📴 Zero-Fail Offline Sandbox**: Real-time browser-side fallbacks for profiling, tax guidelines, rebalance math, and scenario insights if connection to the backend fails.
+- **Personality Profiler**: Instantly classifies users into archetypes (*Debt Warrior*, *Impulsive Spender*, *Conservative Saver*, *Aggressive Grower*, *Disciplined Builder*, *Balanced Achiever*) using deterministic cash flow and savings algorithms.
+- **Stochastic Monte Carlo Simulator**: Projects 10,000 randomized market paths (downside P10 to upside P90) based on asset class volatility weights, showcasing future net worth curves.
+- **Structured Milestone Goals**: Mathematical planners for Buying a House (with automated EMI warnings), Early Retirement (FIRE 30x rule), and Child Education (8% inflation-adjusted cost curve).
+- **Smart Rebalancing**: Instantly compares current allocations with targets adjusted for age and risk tolerance. Generates step-by-step transaction check-off logs.
+- **Tax Optimizer**: Exposes deductions and harvesting opportunities (Section 80C, 80D, NPS, and LTCG gains booking) based on tax slabs.
+- **Zero-Fail Offline Sandbox**: Real-time browser-side fallbacks for profiling, tax guidelines, rebalance math, and scenario insights if connection to the backend fails.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: React (Vite), TailwindCSS, Recharts (financial models and radar charts), Zustand (state management).
 - **Backend**: Node.js, Express, Axios, Yahoo Finance API proxy.
@@ -25,7 +25,7 @@ FinTwin is engineered to run in a hybrid model—utilizing **Groq/Gemini AI APIs
 
 ---
 
-## ⚙️ Installation & Local Setup
+## Installation & Local Setup
 
 ### 1. Install Dependencies
 From the repository root:
@@ -60,7 +60,7 @@ npm run dev
 
 ---
 
-## ☁️ Cloudflare Deployment Guide
+## Cloudflare Deployment Guide
 
 FinTwin can be deployed globally on Cloudflare's serverless infrastructure (Cloudflare Pages for the frontend and Cloudflare Workers for the backend Express API).
 
@@ -89,7 +89,7 @@ MOCK_AI = "false"
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 FinTwin/
@@ -110,6 +110,6 @@ FinTwin/
 
 ---
 
-## 🛡️ License
+## License
 
 This project is licensed under the terms of the [MIT License](file:///c:/Users/LAKSH%20AGRAWAL/Desktop/VSCode/Main%20Projects/FinTwin/LICENSE).
