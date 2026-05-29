@@ -35,7 +35,41 @@ export default function InvestmentManager() {
     if (portfolio.length > 0 && userProfile) {
       postHealthScore(userProfile, portfolio).then(res => {
         if (res) setHealthScore(res);
-      }).catch(console.error);
+      }).catch(err => {
+        console.warn("Backend health score API failed, running client-side calculations fallback:", err);
+        
+        const currentAllocMap = { Equity: 0, Debt: 0, Gold: 0, Crypto: 0 };
+        portfolio.forEach(h => currentAllocMap[h.type] = (currentAllocMap[h.type] || 0) + (h.currentValue || 0));
+        const totalAllocValue = Object.values(currentAllocMap).reduce((a,b)=>a+b, 0) || 1;
+        
+        const eqPct = (currentAllocMap.Equity / totalAllocValue) * 100;
+        const cryptoPct = (currentAllocMap.Crypto / totalAllocValue) * 100;
+        const goldPct = (currentAllocMap.Gold / totalAllocValue) * 100;
+        
+        let localAdvice = "";
+        if (eqPct > 80) {
+          localAdvice = `✦ Offline Advisor: Your portfolio has high volatility with ${eqPct.toFixed(0)}% Equity. We recommend allocating 15% towards Debt/Gold to secure gains.`;
+        } else if (cryptoPct > 10) {
+          localAdvice = `✦ Offline Advisor: High concentration (${cryptoPct.toFixed(0)}%) in Crypto. Consider scaling back below 5% to limit downside shocks.`;
+        } else if (goldPct < 5) {
+          localAdvice = `✦ Offline Advisor: You have low exposure (${goldPct.toFixed(0)}%) to Gold. Allocating 5-10% in Gold acts as a strong inflation hedge.`;
+        } else {
+          localAdvice = `✦ Offline Advisor: Your asset mix is well-balanced. Keep up your systematic monthly investments.`;
+        }
+        
+        setHealthScore({
+          totalScore: 70,
+          grade: 'B',
+          aiAdvice: localAdvice,
+          breakdown: [
+            { category: 'Emergency Fund', score: 15, max: 20, message: 'Offline Mode: Basic Emergency coverage assumed' },
+            { category: 'Savings Rate', score: 15, max: 20, message: 'Offline Mode: Moderate savings rate assumed' },
+            { category: 'Debt Load', score: 15, max: 20, message: 'Offline Mode: Moderate debt load assumed' },
+            { category: 'Insurance', score: 10, max: 20, message: 'Offline Mode: Health insurance active' },
+            { category: 'Asset Mix & Risk', score: 15, max: 20, message: 'Offline Mode: Standard allocation', metrics: { concentrationRisk: 30, volatilityRisk: Math.round(eqPct), liquidityRisk: 20 } }
+          ]
+        });
+      });
     }
   }, [portfolio, userProfile, setHealthScore]);
 
@@ -126,7 +160,7 @@ export default function InvestmentManager() {
   return (
     <div className="min-h-screen bg-[#080C14] text-[#EEF2FF] font-sans pb-16">
 
-      <div className="max-w-[1400px] mx-auto p-[32px]">
+      <div className="max-w-[1400px] mx-auto p-4 sm:p-6 md:p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-2xl font-bold">Investment Manager</h1>

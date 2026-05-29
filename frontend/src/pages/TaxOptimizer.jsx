@@ -21,7 +21,83 @@ export default function TaxOptimizer() {
         .then(res => {
           if (res) setTaxData(res);
         })
-        .catch(console.error)
+        .catch(err => {
+          console.warn("Backend tax optimizer failed, running client-side calculations fallback:", err);
+          
+          const TAX_RULES = {
+            STCG_EQUITY: 0.20,
+            LTCG_EQUITY: 0.125,
+            LTCG_DEBT: 'slab',
+            SECTION_80C_LIMIT: 150000,
+            SECTION_80D_LIMIT: 25000,
+            NPS_ADDITIONAL: 50000,
+            LTCG_EQUITY_EXEMPT: 125000,
+          };
+
+          const suggestions = [];
+          let estimatedTaxSaving = 0;
+          const taxBracket = Number(userProfile?.taxBracket) || 30;
+
+          // 80C headroom
+          const invested80C = Number(userProfile?.invested80C) || 0;
+          const headroom80C = Math.max(0, TAX_RULES.SECTION_80C_LIMIT - invested80C);
+          if (headroom80C > 0) {
+            const saving = headroom80C * (taxBracket / 100);
+            estimatedTaxSaving += saving;
+            suggestions.push({
+              type: '80C',
+              action: `Invest ₹${headroom80C.toLocaleString('en-IN')} more in ELSS/PPF/LIC`,
+              saving: Math.round(saving),
+              priority: 'high',
+            });
+          }
+
+          // NPS
+          if (!userProfile?.hasNPS) {
+            const npsSaving = TAX_RULES.NPS_ADDITIONAL * (taxBracket / 100);
+            estimatedTaxSaving += npsSaving;
+            suggestions.push({
+              type: 'NPS',
+              action: 'Open NPS account — additional ₹50,000 deduction under 80CCD(1B)',
+              saving: Math.round(npsSaving),
+              priority: 'high',
+            });
+          }
+
+          // LTCG harvesting
+          for (const asset of portfolio) {
+            if (asset.type === 'Equity') {
+              const gain = (asset.currentValue || 0) - (asset.costBasis || 0);
+              if (gain > 0 && gain <= TAX_RULES.LTCG_EQUITY_EXEMPT) {
+                suggestions.push({
+                  type: 'LTCG Harvesting',
+                  action: `Book gains of ₹${gain.toLocaleString('en-IN')} in ${asset.name} — within ₹1.25L exempt limit, then rebuy`,
+                  saving: Math.round(gain * TAX_RULES.LTCG_EQUITY),
+                  priority: 'medium',
+                });
+              }
+            }
+          }
+
+          // Health Insurance
+          if (!userProfile?.hasHealthInsurance) {
+            const saving80D = TAX_RULES.SECTION_80D_LIMIT * (taxBracket / 100);
+            estimatedTaxSaving += saving80D;
+            suggestions.push({
+              type: '80D',
+              action: `Get health insurance — up to ₹${TAX_RULES.SECTION_80D_LIMIT.toLocaleString('en-IN')} deduction under 80D`,
+              saving: Math.round(saving80D),
+              priority: 'high',
+            });
+          }
+
+          setTaxData({
+            suggestions,
+            totalEstimatedSaving: Math.round(estimatedTaxSaving),
+            taxRules: TAX_RULES,
+            isOffline: true
+          });
+        })
         .finally(() => setLoading(false));
     }
   }, [portfolio, userProfile]);
@@ -58,11 +134,20 @@ export default function TaxOptimizer() {
 
   return (
     <div className="min-h-screen bg-[#080C14] text-[#EEF2FF] font-sans pb-16">
-      <div className="max-w-[1200px] mx-auto p-[32px]">
+      <div className="max-w-[1200px] mx-auto p-4 sm:p-6 md:p-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold">Tax Optimizer</h1>
           <p className="text-[#566580] text-sm mt-1">Expose deductions and equity gain harvesting specific to your tax bracket.</p>
         </div>
+
+        {taxData?.isOffline && (
+          <div className="w-full bg-[#F5A623]/10 border border-[#F5A623]/30 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <span className="text-xl">⚠️</span>
+            <p className="text-[#F5A623] text-[13px] font-medium">
+              Offline Sandbox Mode: Showing standard Indian tax rules adjusted for your tax slab.
+            </p>
+          </div>
+        )}
 
         {/* Overview cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

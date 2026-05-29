@@ -21,7 +21,14 @@ router.get('/', async (req, res, next) => {
         return sym;
     });
 
-    const response = await axios.get(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${formattedSymbols.join(',')}`);
+    const response = await axios.get(
+      `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${formattedSymbols.join(',')}`,
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+      }
+    );
     const results = {};
     
     if (response.data && response.data.quoteResponse && response.data.quoteResponse.result) {

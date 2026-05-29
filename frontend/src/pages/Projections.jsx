@@ -37,7 +37,7 @@ export default function Projections() {
     return (
       <div className="min-h-screen bg-[#080C14] text-[#EEF2FF] font-sans pb-16">
 
-        <div className="max-w-[1400px] mx-auto p-[32px]">
+        <div className="max-w-[1400px] mx-auto p-4 sm:p-6 md:p-8">
           <LoadingSkeleton rows={8} height={50} />
         </div>
       </div>
@@ -60,13 +60,13 @@ export default function Projections() {
   return (
     <div className="min-h-screen bg-[#080C14] text-[#EEF2FF] font-sans pb-16">
 
-      <div className="max-w-[1400px] mx-auto p-[32px]">
-        <div className="flex justify-between items-center mb-8">
+      <div className="max-w-[1400px] mx-auto p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-bold">Return Projections</h1>
             <p className="text-[#566580] text-sm mt-1">20-year probabilistic decay and performance modelling.</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4 w-full md:w-auto justify-between md:justify-end">
             <label className="flex items-center gap-2 cursor-pointer">
               <span className={`text-[12px] ${inflationAdjusted ? 'text-[#00E5B8]' : 'text-[#566580]'}`}>Inflation adjusted</span>
               <input type="checkbox" checked={inflationAdjusted} onChange={() => setInflationAdjusted(!inflationAdjusted)} className="accent-[#00E5B8]" />
@@ -86,9 +86,9 @@ export default function Projections() {
 
         {/* Current Portfolio Chart Card */}
         <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-8 shadow-xl">
-          <div className="flex justify-between items-end mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <h2 className="text-[#EEF2FF] font-semibold">Current Portfolio Projection</h2>
-            <div className="flex gap-6">
+            <div className="flex flex-wrap gap-4 md:gap-6 justify-between w-full md:w-auto">
               <div className="flex flex-col items-end">
                 <span className="text-[10px] text-[#566580] font-bold uppercase tracking-wider">Median Year {selectedYear}</span>
                 <span className="text-[16px] text-[#00E5B8] font-bold">{formatINR(currentP50)}</span>
@@ -119,9 +119,9 @@ export default function Projections() {
 
         {/* After Rebalancing Chart Card */}
         <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-8 shadow-xl">
-          <div className="flex justify-between items-end mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <h2 className="text-[#EEF2FF] font-semibold">After Rebalancing</h2>
-            <div className="flex gap-6">
+            <div className="flex flex-wrap gap-4 md:gap-6 justify-between w-full md:w-auto">
               <div className="flex flex-col items-end">
                 <span className="text-[10px] text-[#566580] font-bold uppercase tracking-wider">Median Year {selectedYear}</span>
                 <span className="text-[16px] text-[#00E5B8] font-bold">{formatINR(rebP50)}</span>

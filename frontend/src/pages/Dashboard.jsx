@@ -106,8 +106,17 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#080C14] text-[#EEF2FF] font-sans pb-16">
       
-      <div className="max-w-[1400px] mx-auto p-[32px]">
+      <div className="max-w-[1400px] mx-auto p-4 sm:p-6 md:p-8">
         <h1 className="text-2xl font-bold mb-6">Twin Dashboard</h1>
+
+        {twinState?.isSandboxMode && (
+          <div className="w-full bg-[#F5A623]/10 border border-[#F5A623]/30 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <span className="text-xl">⚠️</span>
+            <p className="text-[#F5A623] text-[14px] font-medium">
+              Offline Sandbox Mode: The backend server was unreachable. Your profile and twin characteristics are being calculated locally in your browser.
+            </p>
+          </div>
+        )}
         
         <div className="flex flex-col lg:flex-row gap-[24px]">
           <div className="w-full lg:w-[60%] flex flex-col gap-6">

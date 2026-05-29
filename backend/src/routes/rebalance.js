@@ -83,9 +83,10 @@ router.post('/', async (req, res, next) => {
         }
       }
 
-      const prompt = `You are a financial advisor. Briefly explain in MAXIMUM 15 words why we should ${actionType} ₹${Math.round(amount)} of ${item.name} to reach our optimal asset allocation. Target class allocation is ${TARGETS[item.type]*100}%.`;
-      const rawReason = await callClaude('You give very short financial explanations.', prompt, false);
-      const reasonText = typeof rawReason === 'string' ? rawReason.trim() : JSON.stringify(rawReason);
+      const targetPct = Math.round(TARGETS[item.type] * 100);
+      const reasonText = actionType === 'BUY'
+        ? `Reallocate to accumulate ${item.name} towards target of ${targetPct}% in ${item.type}.`
+        : `Sell overexposed holdings in ${item.name} to trim ${item.type} towards target of ${targetPct}%.`;
 
       actions.push({
         step: actions.length + 1,

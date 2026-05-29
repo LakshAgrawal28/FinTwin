@@ -22,7 +22,104 @@ export default function RebalanceAdvisor() {
     if (portfolio.length > 0) {
       postRebalance(portfolio, customTargets, userProfile).then(res => {
         if (res) setRebalanceActions(res);
-      }).catch(console.error);
+      }).catch(err => {
+        console.warn("Backend rebalance API failed, running client-side calculations fallback:", err);
+        
+        let TARGETS = { Equity: 0.65, Debt: 0.30, Gold: 0.05, Crypto: 0.0 };
+        
+        if (customTargets && typeof customTargets === 'object') {
+          TARGETS = {
+            Equity: Number(customTargets.Equity ?? 65) / 100,
+            Debt: Number(customTargets.Debt ?? 30) / 100,
+            Gold: Number(customTargets.Gold ?? 5) / 100,
+            Crypto: Number(customTargets.Crypto ?? 0) / 100
+          };
+        } else if (userProfile) {
+          const age = Number(userProfile.age) || 30;
+          const drive = userProfile.emotionalChoice || 'Balance';
+          
+          let eq = (100 - age) / 100;
+          let gold = 0.05;
+          
+          if (drive === 'Security') {
+            eq = Math.max(0.1, eq - 0.15);
+          } else if (drive === 'Growth') {
+            eq = Math.min(0.9, eq + 0.15);
+          } else if (drive === 'Independence') {
+            eq = Math.min(0.85, eq + 0.10);
+          }
+          
+          let debt = Math.max(0, 1.0 - eq - gold);
+          TARGETS = { Equity: eq, Debt: debt, Gold: gold, Crypto: 0.0 };
+        }
+
+        let totalValue = portfolio.reduce((sum, item) => sum + item.currentValue, 0);
+        
+        const currentByType = { Equity: 0, Debt: 0, Gold: 0, Crypto: 0 };
+        portfolio.forEach(item => {
+          if (currentByType[item.type] !== undefined) {
+            currentByType[item.type] += item.currentValue;
+          }
+        });
+
+        const actions = [];
+        
+        for (const item of portfolio) {
+          if (!TARGETS.hasOwnProperty(item.type)) continue;
+          
+          const currentAllocationAmt = currentByType[item.type] || Math.max(0.1, item.currentValue);
+          const expectedAssetValue = totalValue * TARGETS[item.type] * (item.currentValue / currentAllocationAmt);
+          let diff = expectedAssetValue - item.currentValue;
+          
+          if (Math.abs(diff) < 1000) continue;
+          
+          const actionType = diff > 0 ? 'BUY' : 'SELL';
+          const amount = Math.abs(diff);
+          const postTradeValue = item.currentValue + diff;
+
+          let taxAmount = 0;
+          let taxType = 'None';
+          
+          if (actionType === 'SELL') {
+            const fractionSold = amount / item.currentValue;
+            const gainFromSale = (item.currentValue - item.costBasis) * fractionSold;
+            
+            if (gainFromSale > 0) {
+              if (item.type === 'Crypto') {
+                taxAmount = gainFromSale * 0.30;
+                taxType = 'STCG Rate (30%)';
+              } else if (item.type === 'Equity') {
+                taxAmount = Math.max(0, gainFromSale - 100000) * 0.10;
+                if (taxAmount > 0) taxType = 'LTCG Rate (10% over 1L)';
+              } else if (item.type === 'Debt') {
+                taxAmount = gainFromSale * 0.20;
+                taxType = 'LTCG Rate (20%)';
+              }
+            }
+          }
+
+          const targetPct = Math.round(TARGETS[item.type] * 100);
+          const reasonText = actionType === 'BUY'
+            ? `Reallocate to accumulate ${item.name} towards target of ${targetPct}% in ${item.type}.`
+            : `Sell overexposed holdings in ${item.name} to trim ${item.type} towards target of ${targetPct}%.`;
+
+          actions.push({
+            step: actions.length + 1,
+            action: actionType,
+            assetName: item.name,
+            amount: Math.round(amount),
+            currentValue: Math.round(item.currentValue),
+            postTradeValue: Math.round(postTradeValue),
+            reason: reasonText,
+            taxAmount: Math.round(taxAmount),
+            taxType,
+            tip: reasonText
+          });
+        }
+        
+        actions.isOffline = true;
+        setRebalanceActions(actions);
+      });
     }
   }, [portfolio, customTargets, userProfile, setRebalanceActions]);
 
@@ -69,11 +166,20 @@ export default function RebalanceAdvisor() {
   return (
     <div className="min-h-screen bg-[#080C14] text-[#EEF2FF] font-sans pb-16">
 
-      <div className="max-w-[1400px] mx-auto p-[32px]">
+      <div className="max-w-[1400px] mx-auto p-4 sm:p-6 md:p-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold">Rebalance Advisor</h1>
           <p className="text-[#566580] text-sm mt-1">AI-generated trade sequence to optimize your exact portfolio bounds.</p>
         </div>
+
+        {rawRebalanceActions?.isOffline && (
+          <div className="w-full bg-[#F5A623]/10 border border-[#F5A623]/30 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <span className="text-xl">⚠️</span>
+            <p className="text-[#F5A623] text-[14px] font-medium">
+              Offline Sandbox Mode: Backend unreachable. Trade suggestions have been calculated locally on your device.
+            </p>
+          </div>
+        )}
 
         <div className="w-full bg-[#00E5B8]/10 border border-[#00E5B8]/30 rounded-xl p-4 mb-8 flex items-center gap-3">
           <span className="text-xl">💡</span>

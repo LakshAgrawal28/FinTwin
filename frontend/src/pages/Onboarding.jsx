@@ -72,6 +72,19 @@ export default function Onboarding() {
         ]
       });
       setCurrentStep(0);
+    } else if (type === 'average') {
+      setFormData({
+        age: 32, retirementAge: 60, income: 120000, expenses: 40000, variableSpend: 15000, emi: 10000, portfolioValue: 800000,
+        emotionalChoice: 'Balance', monthlyIncome: 120000, monthlyExpenses: 40000, monthlyEMI: 10000,
+        currentSavings: 200000, monthlyInvestment: 25000, employmentType: 'salaried', taxBracket: 20, dependents: 1,
+        hasHealthInsurance: true, hasTermInsurance: false,
+        holdings: [
+          { name: 'HDFCBANK', type: 'Equity', units: 350, costBasis: 1500 },
+          { name: 'SBI-FD', type: 'Debt', units: 200, costBasis: 1000 },
+          { name: 'SGB', type: 'Gold', units: 10, costBasis: 7500 }
+        ]
+      });
+      setCurrentStep(0);
     } else {
       setFormData({
         age: 42, retirementAge: 60, income: 90000, expenses: 50000, variableSpend: 15000, emi: 25000, portfolioValue: 150000,
@@ -154,11 +167,96 @@ export default function Onboarding() {
           console.error("Quote error", err);
         }
       }
-      
       navigate('/twin');
-      console.error(err);
-      const errorMessage = err.response?.data?.error || err.message || 'Failed to generate your financial twin.';
-      setError(errorMessage);
+    } catch (err) {
+      console.warn("Backend profile API failed, running client-side classification fallback:", err);
+      
+      const inc = Number(formData.monthlyIncome || formData.income) || 0;
+      const exp = Number(formData.monthlyExpenses || formData.expenses) || 0;
+      const emi = Number(formData.monthlyEMI || formData.emi) || 0;
+      const varSp = Number(formData.variableSpend || 0);
+      const savings = inc - exp - emi - varSp;
+      const savingsRate = inc > 0 ? (savings / inc) * 100 : 0;
+      const drive = formData.emotionalChoice || 'Balance';
+
+      let archetype = "Balanced Achiever";
+      let riskScore = 60;
+      let traits = [];
+      let summary = "";
+
+      if (inc > 0 && (emi / inc) > 0.35) {
+        archetype = "Debt Warrior";
+        riskScore = 40;
+        traits = ["Debt-Focused", "Stressed Cash Flow", "Risk-Averse"];
+        summary = `Your primary financial focus is managing and servicing debt payments, which currently consume ${Math.round((emi/inc)*100)}% of your monthly take-home. Your priority should be building an emergency shield of 6 months' expenses and systematically paying down liabilities.`;
+      } else if (savingsRate < 10) {
+        archetype = "Impulsive Spender";
+        riskScore = 70;
+        traits = ["High Discretionary Spend", "Low Cash Reserve", "Optimistic"];
+        summary = `With a savings rate of ${savingsRate.toFixed(1)}%, your monthly income is leaking into discretionary spend. Establishing automated SIPs first will help enforce savings discipline.`;
+      } else if (savingsRate >= 35 && drive === 'Security') {
+        archetype = "Conservative Saver";
+        riskScore = 30;
+        traits = ["Capital Preservation", "High Liquidity", "Risk-Averse"];
+        summary = `You have an excellent savings rate of ${savingsRate.toFixed(1)}%, but prioritize capital preservation. Consider systematic indexing to protect your wealth against inflation.`;
+      } else if (savingsRate >= 35 && drive === 'Growth') {
+        archetype = "Aggressive Grower";
+        riskScore = 85;
+        traits = ["High Risk Appetite", "Wealth compounding", "Optimistic"];
+        summary = `An exceptional savings rate of ${savingsRate.toFixed(1)}% combined with a focus on high growth makes you a compounding machine. Volatility is your friend.`;
+      } else if (drive === 'Independence') {
+        archetype = "Disciplined Builder";
+        riskScore = 65;
+        traits = ["Goal Oriented", "Structured Planner", "Patient"];
+        summary = `You are focused on building financial independence and autonomy. You manage cash flow systematically and allocate capital with a multi-year horizon.`;
+      } else {
+        archetype = "Balanced Achiever";
+        riskScore = 60;
+        traits = ["Balanced Risk", "Discipline Saver", "Patience"];
+        summary = `You maintain a healthy balance between current lifestyle spending and future goals (savings rate: ${savingsRate.toFixed(1)}%). Your risk tolerance is moderate.`;
+      }
+
+      const currentSavingsVal = Number(formData.currentSavings) || 0;
+      const monthlyExpensesTotal = exp + emi;
+      const liquidityRatio = monthlyExpensesTotal > 0 ? (currentSavingsVal / monthlyExpensesTotal) : 0;
+
+      const radarScores = {
+        riskTolerance: riskScore,
+        discipline: Math.round(Math.min(95, Math.max(30, 20 + savingsRate * 1.5))),
+        patience: drive === 'Security' ? 85 : drive === 'Independence' ? 80 : 70,
+        optimism: drive === 'Growth' ? 85 : drive === 'Security' ? 45 : 65,
+        liquidity: Math.round(Math.min(95, Math.max(20, liquidityRatio * 15)))
+      };
+
+      const monthlyNetWorth = savings > 0 ? savings : 10000;
+      const portfolioValue = Number(formData.portfolioValue) || 0;
+      const estimatedNetWorth = portfolioValue + currentSavingsVal;
+
+      const localTwinState = {
+        archetype,
+        riskScore,
+        radarScores,
+        summary,
+        traits,
+        savingsRate: Math.round(savingsRate * 10) / 10,
+        monthlyNetWorth,
+        estimatedNetWorth,
+        isSandboxMode: true
+      };
+
+      setTwinState(localTwinState);
+
+      // Local holdings fallback enrichment
+      if (formData.holdings.length > 0) {
+        const enrichedHoldings = formData.holdings.map(h => ({
+          ...h,
+          currentValue: h.units * h.costBasis,
+          costBasis: h.units * h.costBasis
+        }));
+        setPortfolio(enrichedHoldings);
+      }
+
+      navigate('/twin');
     } finally {
       setIsLoading(false);
     }
@@ -168,7 +266,7 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen bg-[#080C14] flex flex-col items-center justify-center p-6 text-[#EEF2FF] font-sans">
-      <div className="w-full max-w-lg bg-[#0F1520] border border-white/5 rounded-2xl p-8 shadow-2xl">
+      <div className="w-full max-w-lg bg-[#0F1520] border border-white/5 rounded-2xl p-4 sm:p-8 shadow-2xl">
         <div className="flex items-center gap-3 mb-6 justify-center">
           <div className="w-10 h-10 bg-[#00E5B8] text-[#080C14] rounded-xl flex items-center justify-center font-bold text-xl">FT</div>
           <h1 className="text-2xl font-bold">FinTwin</h1>
@@ -197,6 +295,9 @@ export default function Onboarding() {
           <button type="button" onClick={() => loadPreset('excellent')} className="text-[11px] bg-[#00E5B8]/10 border border-[#00E5B8]/30 text-[#00E5B8] px-3 py-1.5 rounded-lg font-bold hover:bg-[#00E5B8]/20 transition-colors uppercase tracking-wider">
             ★ Load "Excellent"
           </button>
+          <button type="button" onClick={() => loadPreset('average')} className="text-[11px] bg-[#3b82f6]/10 border border-[#3b82f6]/30 text-[#3b82f6] px-3 py-1.5 rounded-lg font-bold hover:bg-[#3b82f6]/20 transition-colors uppercase tracking-wider">
+            ⚖ Load "Average"
+          </button>
           <button type="button" onClick={() => loadPreset('danger')} className="text-[11px] bg-[#FF4D4D]/10 border border-[#FF4D4D]/30 text-[#FF4D4D] px-3 py-1.5 rounded-lg font-bold hover:bg-[#FF4D4D]/20 transition-colors uppercase tracking-wider">
             ⚠ Load "Danger"
           </button>
@@ -211,7 +312,7 @@ export default function Onboarding() {
         <form onSubmit={handleSubmit}>
           {currentStep === 0 && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] text-[#8A9BBF] mb-1">Your Age</label>
                   <input required type="number" name="age" value={formData.age} onChange={handleChange} min={18} max={70} placeholder="e.g. 28" className={inputStyle} />
@@ -222,7 +323,7 @@ export default function Onboarding() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] text-[#8A9BBF] mb-1">Monthly Income (₹)</label>
                   <input required type="number" name="income" value={formData.income} onChange={handleChange} className={inputStyle} />
@@ -233,7 +334,7 @@ export default function Onboarding() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] text-[#8A9BBF] mb-1">Variable Spend (₹)</label>
                   <input required type="number" name="variableSpend" value={formData.variableSpend} onChange={handleChange} className={inputStyle} />
@@ -283,7 +384,7 @@ export default function Onboarding() {
             <div className="space-y-4">
               <p className="text-[12px] text-[#8A9BBF] text-center mb-2">This powers all calculations — be as accurate as possible</p>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] text-[#8A9BBF] mb-1">Monthly Take-Home (₹)</label>
                   <input type="number" name="monthlyIncome" value={formData.monthlyIncome} onChange={handleChange} placeholder="e.g. 85000" className={inputStyle} />
@@ -294,7 +395,7 @@ export default function Onboarding() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] text-[#8A9BBF] mb-1">Total EMIs (₹)</label>
                   <input type="number" name="monthlyEMI" value={formData.monthlyEMI} onChange={handleChange} placeholder="Home, car loan..." className={inputStyle} />
@@ -305,7 +406,7 @@ export default function Onboarding() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] text-[#8A9BBF] mb-1">Tax Bracket (%)</label>
                   <select name="taxBracket" value={formData.taxBracket} onChange={handleChange} className={inputStyle + " appearance-none"}>
@@ -320,7 +421,7 @@ export default function Onboarding() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] text-[#8A9BBF] mb-1">Employment</label>
                   <select name="employmentType" value={formData.employmentType} onChange={handleChange} className={inputStyle + " appearance-none"}>
