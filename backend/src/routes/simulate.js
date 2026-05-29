@@ -1,10 +1,8 @@
 import { Router } from 'express';
-import { runMonteCarlo } from '../engine/monteCarlo.js';
-import { getScenarioDelta } from '../engine/scenarioDeltas.js';
 
 const router = Router();
 
-// ── Standalone Box-Muller for new Monte Carlo ──────────────────────────────
+// ── Standalone Box-Muller for Monte Carlo ──────────────────────────────
 function boxMullerRandom() {
   let u = 0, v = 0;
   while (u === 0) u = Math.random();
@@ -12,7 +10,53 @@ function boxMullerRandom() {
   return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
 
-// ── New Monte Carlo supporting full scenario objects ───────────────────────
+// ── Portfolio-Weighted Returns and Volatilities ────────────────────────
+function getPortfolioMetrics(portfolioData, baseReturn, baseVol) {
+  // Support both holdings array or structure { holdings: [...] }
+  const holdings = portfolioData?.holdings || (Array.isArray(portfolioData) ? portfolioData : []);
+  
+  if (holdings.length === 0) {
+    return { expectedReturn: baseReturn, expectedVolatility: baseVol };
+  }
+
+  // standard asset class estimates
+  const assetSpecs = {
+    Equity: { returnRate: 0.13, volatility: 0.16 },
+    Debt: { returnRate: 0.07, volatility: 0.03 },
+    Gold: { returnRate: 0.09, volatility: 0.11 },
+    Crypto: { returnRate: 0.20, volatility: 0.65 }
+  };
+
+  let totalValue = 0;
+  const classValues = { Equity: 0, Debt: 0, Gold: 0, Crypto: 0 };
+
+  holdings.forEach(item => {
+    const val = item.currentValue || (item.units * (item.costBasis || 0)) || 0;
+    const type = item.type || 'Equity';
+    if (classValues[type] !== undefined) {
+      classValues[type] += val;
+      totalValue += val;
+    }
+  });
+
+  if (totalValue === 0) {
+    return { expectedReturn: baseReturn, expectedVolatility: baseVol };
+  }
+
+  let weightedReturn = 0;
+  let weightedVol = 0;
+
+  Object.keys(classValues).forEach(type => {
+    const weight = classValues[type] / totalValue;
+    const spec = assetSpecs[type];
+    weightedReturn += weight * spec.returnRate;
+    weightedVol += weight * spec.volatility;
+  });
+
+  return { expectedReturn: weightedReturn, expectedVolatility: weightedVol };
+}
+
+// ── Overhauled Monte Carlo Engine ──────────────────────────────────────
 function runNewMonteCarlo(params) {
   const {
     initialPortfolio,
@@ -23,8 +67,9 @@ function runNewMonteCarlo(params) {
     years,
     simulations = 1000,
     majorExpenses = [],
-    withdrawalStartYear = null,
-    withdrawalAmount = 0,
+    activeLoans = [],
+    retirementStartMonth = null,
+    monthlyWithdrawal = 0,
   } = params;
 
   const months = years * 12;
@@ -40,24 +85,43 @@ function runNewMonteCarlo(params) {
     for (let m = 1; m <= months; m++) {
       const shock = boxMullerRandom();
       const monthReturn = monthlyReturn + monthlyVolatility * shock;
+      
+      // Compound portfolio
       portfolio *= (1 + monthReturn);
 
-      // Add monthly contribution (with 5% annual step-up, applied yearly)
-      const currentYear = Math.floor((m - 1) / 12);
-      const stepUpMultiplier = Math.pow(1.05, currentYear);
-      portfolio += monthlyContribution * stepUpMultiplier;
+      // Contributions (only if not retired)
+      if (retirementStartMonth === null || m < retirementStartMonth) {
+        const currentYear = Math.floor((m - 1) / 12);
+        const stepUpMultiplier = Math.pow(1.05, currentYear); // 5% annual step-up
+        portfolio += monthlyContribution * stepUpMultiplier;
+      }
 
-      // Major expense at this year
-      const yearNum = Math.floor(m / 12);
-      majorExpenses.forEach(exp => {
-        if (exp.year === yearNum && m % 12 === 0) {
-          portfolio = portfolio - exp.amount;
+      // Deduct EMIs
+      activeLoans.forEach(loan => {
+        if (m >= loan.startMonth && m <= loan.endMonth) {
+          portfolio -= loan.emi;
         }
       });
 
-      // Withdrawals
-      if (withdrawalStartYear && yearNum >= withdrawalStartYear && m % 12 === 0) {
-        portfolio = Math.max(0, portfolio - withdrawalAmount);
+      // Deduct major expenses
+      majorExpenses.forEach(exp => {
+        // Precise month-based deduction
+        if (exp.month === m) {
+          portfolio -= exp.amount;
+        }
+        // Legacy fallback
+        if (exp.year !== undefined && exp.month === undefined) {
+          const yearNum = Math.floor(m / 12);
+          if (exp.year === yearNum && m % 12 === 0) {
+            portfolio -= exp.amount;
+          }
+        }
+      });
+
+      // Deduct monthly withdrawals (inflated at monthly step-ups)
+      if (retirementStartMonth !== null && m >= retirementStartMonth) {
+        const inflationMultiplier = Math.pow(1 + (inflationRate / 12), m - retirementStartMonth);
+        portfolio -= monthlyWithdrawal * inflationMultiplier;
       }
 
       if (m % 12 === 0) trajectory.push(portfolio);
@@ -94,70 +158,130 @@ function runNewMonteCarlo(params) {
 
 router.post('/', async (req, res, next) => {
   try {
-    // Accept both 'scenario' and 'scenarioKey' — prefer 'scenario' (B1 fix)
-    const { userProfile, scenario, scenarioKey, years = 15, iterations = 5000, portfolio, profile, simMode = 'balanced' } = req.body;
+    const { userProfile, scenario, scenarioKey, years = 15, iterations = 1000, portfolio, profile, simMode = 'balanced' } = req.body;
     const resolvedScenario = scenario || scenarioKey;
 
-    // ── NEW PATH: Full scenario object from AI parser ─────────────────────
-    if (resolvedScenario && typeof resolvedScenario === 'object') {
-      const initialPortfolio = portfolio?.totalValue ??
-        (portfolio?.assets ? Object.values(portfolio.assets).reduce((s, a) => s + (a.value || 0), 0) : null) ??
-        Number(userProfile?.portfolioValue) ?? 100000;
+    // Define simulation mode scales
+    let returnMultiplier = 1.0;
+    let volMultiplier = 1.0;
+    let baseInflation = 0.06;
 
-      const baseSIP = profile?.monthlyInvestment ?? userProfile?.monthlyInvestment ?? (Number(userProfile?.monthlyIncome) * 0.2);
-      const sipAsNumber = (typeof baseSIP === 'number' && !isNaN(baseSIP)) ? baseSIP : 0;
-      
-      const params = {
-        initialPortfolio,
-        monthlyContribution: sipAsNumber + (resolvedScenario.additionalMonthlyInvestment ?? 0),
-        annualReturnRate: resolvedScenario.annualReturnRate ?? 0.10,
-        inflationRate: resolvedScenario.inflationRate ?? 0.06,
-        volatility: resolvedScenario.volatility ?? 0.15,
-        years: resolvedScenario.years ?? years ?? 20,
-        simulations: 1000,
-        majorExpenses: resolvedScenario.majorExpenses ?? [],
-        withdrawalStartYear: resolvedScenario.withdrawalStartYear ?? null,
-        withdrawalAmount: resolvedScenario.withdrawalAmount ?? 0,
-      };
-
-      const result = runNewMonteCarlo(params);
-      return res.json({ success: true, ...result, scenarioName: resolvedScenario.scenarioName || 'Custom' });
+    if (simMode === 'optimistic') {
+      returnMultiplier = 1.2;
+      volMultiplier = 0.8;
+      baseInflation = 0.04;
+    } else if (simMode === 'stress-test') {
+      returnMultiplier = 0.6;
+      volMultiplier = 1.5;
+      baseInflation = 0.09;
     }
 
-    // ── PRESET / STRING PATH: Map keys to runNewMonteCarlo ────────────
+    // Get portfolio-weighted return and volatility
+    const { expectedReturn, expectedVolatility } = getPortfolioMetrics(
+      portfolio || [],
+      0.10, // baseline return (10%)
+      0.15  // baseline volatility (15%)
+    );
+
+    const finalReturn = expectedReturn * returnMultiplier;
+    const finalVolatility = expectedVolatility * volMultiplier;
+
     const initialPortfolio = portfolio?.totalValue ??
       (portfolio?.holdings ? portfolio.holdings.reduce((s, a) => s + (a.currentValue ?? a.costBasis ?? 0), 0) : null) ??
       (portfolio?.assets ? Object.values(portfolio.assets).reduce((s, a) => s + (a.value ?? 0), 0) : null) ??
       Number(userProfile?.portfolioValue) ?? 100000;
 
     let monthlyContribution = profile?.monthlyInvestment ?? userProfile?.monthlyInvestment ?? (Number(userProfile?.monthlyIncome) * 0.2);
-    // If somehow evaluating to NaN or undefined, coerce to 0 safely
     if (typeof monthlyContribution !== 'number' || isNaN(monthlyContribution)) {
-        monthlyContribution = 0;
+      monthlyContribution = 0;
     }
-    
-    let baseReturn = 0.10;
-    let baseVol = 0.15;
-    let baseInflation = 0.06;
 
-    if (simMode === 'optimistic') {
-      baseReturn = 0.14;
-      baseVol = 0.10;
-      baseInflation = 0.04;
-    } else if (simMode === 'stress-test') {
-      baseReturn = 0.06;
-      baseVol = 0.25;
-      baseInflation = 0.09;
+    // ── GOALS / STRUCTURED SCENARIOS PATH ─────────────────────────────────
+    if (resolvedScenario && typeof resolvedScenario === 'object') {
+      let scenarioName = resolvedScenario.scenarioName || 'Goal Simulation';
+      let expenseArr = [];
+      let loanArr = [];
+      let retirementStartMonth = null;
+      let monthlyWithdrawal = 0;
+      let targetHorizon = years || 15;
+
+      const type = resolvedScenario.type;
+
+      if (type === 'house') {
+        scenarioName = `House Purchase Goal`;
+        const { purchasePrice, purchaseYear, downPaymentPct, interestRate, tenureYears } = resolvedScenario;
+        
+        const downPayment = purchasePrice * (downPaymentPct / 100);
+        expenseArr.push({ month: purchaseYear * 12, amount: downPayment, label: 'House Downpayment' });
+
+        const loanAmount = Math.max(0, purchasePrice - downPayment);
+        if (loanAmount > 0) {
+          const r = (interestRate || 8.5) / (12 * 100);
+          const n = (tenureYears || 15) * 12;
+          const emi = loanAmount * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+          loanArr.push({
+            startMonth: purchaseYear * 12 + 1,
+            endMonth: (purchaseYear + tenureYears) * 12,
+            emi
+          });
+        }
+        targetHorizon = Math.max(years || 15, purchaseYear + tenureYears);
+      } 
+      
+      else if (type === 'retirement') {
+        scenarioName = `Early Retirement (FIRE) Planner`;
+        const { retirementAge, monthlyExpensesInRetirement } = resolvedScenario;
+        const currentAge = Number(userProfile?.age) || 30;
+        const yearsToRetire = Math.max(0, retirementAge - currentAge);
+
+        retirementStartMonth = yearsToRetire * 12;
+        monthlyWithdrawal = monthlyExpensesInRetirement;
+        targetHorizon = Math.max(years || 15, yearsToRetire + 15);
+      } 
+      
+      else if (type === 'education') {
+        scenarioName = `Child Education Fund`;
+        const { targetAmount, yearsRemaining } = resolvedScenario;
+        expenseArr.push({ month: yearsRemaining * 12, amount: targetAmount, label: 'College Tuition' });
+        targetHorizon = Math.max(years || 15, yearsRemaining + 2);
+      }
+
+      const params = {
+        initialPortfolio,
+        monthlyContribution,
+        annualReturnRate: finalReturn,
+        inflationRate: baseInflation,
+        volatility: finalVolatility,
+        years: targetHorizon,
+        simulations: Math.min(iterations || 1000, 1000),
+        majorExpenses: expenseArr,
+        activeLoans: loanArr,
+        retirementStartMonth,
+        monthlyWithdrawal,
+      };
+
+      const result = runNewMonteCarlo(params);
+      
+      // Calculate EMIs for return metadata
+      const totalEMI = loanArr.reduce((sum, l) => sum + l.emi, 0);
+
+      return res.json({
+        success: true,
+        ...result,
+        scenarioName,
+        calculatedEMI: totalEMI,
+        hasAffordabilityWarning: totalEMI > (userProfile?.monthlyIncome * 0.5) // warning if loan EMI exceeds 50% income
+      });
     }
-    
-    // Preset adjustments
+
+    // ── PRESET / STRING PATH (Double SIP, Pause SIP, Quit Job) ────────────
     let scenarioName = 'Custom';
     let expenseArr = [];
-    let volHit = baseVol;
+    let loanArr = [];
 
     if (resolvedScenario === 'pauseSIP') {
       scenarioName = 'Pause SIP (2 Years)';
-      // Hack: deduct the SIP sum as a major expense for Y1 and Y2 since we cant turn off SIP easily
+      // Deduct SIP sums as major expenses for Y1 and Y2
       expenseArr.push({ year: 1, amount: monthlyContribution * 12 });
       expenseArr.push({ year: 2, amount: monthlyContribution * 12 });
     } else if (resolvedScenario === 'doubleSIP') {
@@ -165,36 +289,34 @@ router.post('/', async (req, res, next) => {
       monthlyContribution *= 2;
     } else if (resolvedScenario === 'quitJob') {
       scenarioName = 'Quit my job';
-      // 100% income loss for 6 months -> withdrawal required to live
       const monthlyBurn = Number(userProfile?.expenses || 50000);
-      expenseArr.push({ year: 0, amount: (monthlyBurn + monthlyContribution) * 6 }); 
+      expenseArr.push({ year: 1, amount: (monthlyBurn + monthlyContribution) * 6 }); // 6 months loss
     }
 
     const params = {
       initialPortfolio,
       monthlyContribution,
-      annualReturnRate: baseReturn,
+      annualReturnRate: finalReturn,
       inflationRate: baseInflation,
-      volatility: volHit,
+      volatility: finalVolatility,
       years: years || 20,
-      simulations: Math.min(iterations || 1000, 1000), // Cap at 1000
+      simulations: Math.min(iterations || 1000, 1000),
       majorExpenses: expenseArr,
-      withdrawalStartYear: null,
-      withdrawalAmount: 0,
+      activeLoans: loanArr,
     };
 
     const newResult = runNewMonteCarlo(params);
 
     let dangerZoneMonths = 0;
-    // Map P10 back for danger zone equivalent
     for (const p of newResult.yearlyPercentiles) {
-      if (p.p10 < 500000) dangerZoneMonths += 12; // approximate metric
+      if (p.p10 < 500000) dangerZoneMonths += 12;
     }
 
     res.json({
-      ...newResult, // yearlyPercentiles, median, worstCase, bestCase
+      success: true,
+      ...newResult,
       scenarioKey: resolvedScenario,
-      scenarioName: scenarioName,
+      scenarioName,
       dangerZoneMonths
     });
   } catch (error) {

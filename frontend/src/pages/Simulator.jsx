@@ -3,7 +3,8 @@ import { AreaChart, Area, LineChart, Line, XAxis, YAxis, Tooltip as RechartsTool
 import { useTwinStore } from '../store';
 import { postSimulate, postSimulateScenario } from '../utils/api';
 import ScenarioCard from '../components/simulator/ScenarioCard';
-import ScenarioInput from '../components/simulator/ScenarioInput';
+import StructuredGoalsInput from '../components/simulator/StructuredGoalsInput';
+import CashflowWaterfall from '../components/simulator/CashflowWaterfall';
 import PercentileBandsChart from '../components/simulator/PercentileBandsChart';
 import StreamingInsight from '../components/simulator/StreamingInsight';
 import { formatINR } from '../utils/formatCurrency';
@@ -145,10 +146,10 @@ export default function Simulator() {
                 Preset
               </button>
               <button
-                onClick={() => setMode('freeform')}
-                className={`flex-1 px-4 py-2 text-[12px] font-semibold transition-colors ${mode === 'freeform' ? 'bg-[#00E5B8] text-[#080C14]' : 'text-[#8A9BBF] hover:bg-white/5'}`}
+                onClick={() => setMode('structured')}
+                className={`flex-1 px-4 py-2 text-[12px] font-semibold transition-colors ${mode === 'structured' ? 'bg-[#00E5B8] text-[#080C14]' : 'text-[#8A9BBF] hover:bg-white/5'}`}
               >
-                AI Free-form
+                Structured Goals
               </button>
             </div>
 
@@ -249,11 +250,10 @@ export default function Simulator() {
                 </div>
               </>
             ) : (
-              <ScenarioInput
+              <StructuredGoalsInput
                 onScenarioReady={handleScenarioReady}
-                portfolio={{ holdings: portfolio }}
                 profile={userProfile}
-                simMode={simMode}
+                isSimulating={isSimulating}
               />
             )}
           </div>
@@ -408,6 +408,10 @@ export default function Simulator() {
                 <StreamingInsight userProfile={userProfile || {}} twinState={twinState} simulationResult={simulationResult} />
               </div>
             )}
+            <CashflowWaterfall
+              profile={userProfile}
+              goalEMI={simulationResult?.calculatedEMI || 0}
+            />
           </div>
         </div>
       </div>
