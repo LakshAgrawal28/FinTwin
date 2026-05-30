@@ -86,8 +86,14 @@ function runNewMonteCarlo(params) {
       const shock = boxMullerRandom();
       const monthReturn = monthlyReturn + monthlyVolatility * shock;
       
-      // Compound portfolio
-      portfolio *= (1 + monthReturn);
+      // Compound portfolio correctly
+      if (portfolio > 0) {
+        portfolio *= (1 + monthReturn);
+      } else {
+        // If portfolio is negative, it's considered debt.
+        // We shouldn't shrink debt when the market crashes. Borrowing rate assumed 12%.
+        portfolio *= (1 + (0.12 / 12));
+      }
 
       // Contributions (only if not retired)
       if (retirementStartMonth === null || m < retirementStartMonth) {
@@ -186,10 +192,16 @@ router.post('/', async (req, res, next) => {
     const finalReturn = expectedReturn * returnMultiplier;
     const finalVolatility = expectedVolatility * volMultiplier;
 
-    const initialPortfolio = portfolio?.totalValue ??
-      (portfolio?.holdings ? portfolio.holdings.reduce((s, a) => s + (a.currentValue ?? a.costBasis ?? 0), 0) : null) ??
-      (portfolio?.assets ? Object.values(portfolio.assets).reduce((s, a) => s + (a.value ?? 0), 0) : null) ??
-      Number(userProfile?.portfolioValue) ?? 100000;
+    let initialPortfolio = 100000;
+    if (Array.isArray(portfolio)) {
+      initialPortfolio = portfolio.reduce((s, a) => s + (Number(a.currentValue) || Number(a.costBasis) || 0), 0);
+    } else if (portfolio?.totalValue) {
+      initialPortfolio = Number(portfolio.totalValue);
+    } else if (portfolio?.holdings) {
+      initialPortfolio = portfolio.holdings.reduce((s, a) => s + (Number(a.currentValue) || Number(a.costBasis) || 0), 0);
+    } else if (userProfile?.portfolioValue) {
+      initialPortfolio = Number(userProfile.portfolioValue);
+    }
 
     let monthlyContribution = profile?.monthlyInvestment ?? userProfile?.monthlyInvestment ?? (Number(userProfile?.monthlyIncome) * 0.2);
     if (typeof monthlyContribution !== 'number' || isNaN(monthlyContribution)) {
