@@ -1,8 +1,39 @@
 import axios from 'axios';
 
+// Fallback to Render URL or specific production URL if env is missing in prod
+export const getBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl) return envUrl.replace(/\/+$/, '');
+  
+  // If in production without env var, fallback to a relative path or standard prod URL
+  if (import.meta.env.PROD) {
+    // If the frontend and backend are hosted on the same domain, use origin
+    // Otherwise fallback to the known Render URL (if applicable)
+    return 'https://fintwin-backend.onrender.com'; // Adjust this if you have a specific backend URL
+  }
+  return 'http://localhost:3001';
+};
+
 const api = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, ''),
+  baseURL: getBaseUrl(),
+  timeout: 30000, // 30 second timeout for AI operations
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
+
+// Response interceptor for global error handling
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    console.error('API Error:', error.response || error.message);
+    if (!error.response) {
+      // Network error (CORS or backend down)
+      console.error('Network Error - Backend might be unreachable.');
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const postProfile = async (formData) => {
   const response = await api.post('/api/profile', formData);

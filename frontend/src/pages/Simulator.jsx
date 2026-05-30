@@ -126,54 +126,54 @@ export default function Simulator() {
   const activePreset = SCENARIOS.find(s => s.key === selectedScenario);
 
   return (
-    <div className="min-h-screen bg-[#080C14] text-[#EEF2FF] font-sans pb-16">
-      <div className="max-w-[1600px] mx-auto p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col lg:flex-row gap-[24px] items-stretch">
+    <div className="min-h-screen bg-slate-900 text-slate-50 font-sans pb-16">
+      <div className="w-full px-6 py-8">
+        <div className="flex flex-col lg:flex-row gap-6 items-stretch">
 
           {/* Left Sidebar (280px) */}
           <div className="w-full lg:w-[280px] flex-shrink-0 flex flex-col gap-6">
             <div>
-              <h1 className="text-[16px] font-semibold text-[#EEF2FF]">Run a Scenario</h1>
-              <p className="text-[12px] text-[#566580] mt-1">Simulate any life decision.</p>
+              <h1 className="text-lg font-bold tracking-tight text-slate-50">Run a Scenario</h1>
+              <p className="text-xs text-slate-400 mt-1">Simulate any life decision.</p>
             </div>
 
             {/* Mode Toggle */}
-            <div className="bg-[#1A2235] rounded-lg border border-white/5 flex overflow-hidden">
+            <div className="bg-slate-800 rounded border border-slate-700 flex overflow-hidden">
               <button
                 onClick={() => setMode('preset')}
-                className={`flex-1 px-4 py-2 text-[12px] font-semibold transition-colors ${mode === 'preset' ? 'bg-[#00E5B8] text-[#080C14]' : 'text-[#8A9BBF] hover:bg-white/5'}`}
+                className={`flex-1 px-4 py-2 text-xs font-semibold transition-colors ${mode === 'preset' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-700'}`}
               >
                 Preset
               </button>
               <button
                 onClick={() => setMode('structured')}
-                className={`flex-1 px-4 py-2 text-[12px] font-semibold transition-colors ${mode === 'structured' ? 'bg-[#00E5B8] text-[#080C14]' : 'text-[#8A9BBF] hover:bg-white/5'}`}
+                className={`flex-1 px-4 py-2 text-xs font-semibold transition-colors ${mode === 'structured' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-700'}`}
               >
                 Structured Goals
               </button>
             </div>
 
             {/* Sim Mode Toggle */}
-            <div className="bg-[#0F1520] border border-white/5 rounded-xl p-3">
-              <h3 className="text-[11px] uppercase tracking-widest text-[#566580] font-bold mb-3">Simulation Mode</h3>
+            <div className="bg-slate-800 border border-slate-700 rounded p-4 shadow-sm">
+              <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-3">Simulation Mode</h3>
               <div className="flex flex-col gap-2">
                 <button
                   onClick={() => setSimMode('optimistic')}
-                  className={`text-left px-3 py-2 rounded-lg text-[12px] transition-colors border ${simMode === 'optimistic' ? 'bg-[#22c55e]/10 border-[#22c55e]/30 text-[#22c55e]' : 'border-transparent text-[#8A9BBF] hover:bg-white/5'}`}
+                  className={`text-left px-3 py-2 rounded text-xs transition-colors border ${simMode === 'optimistic' ? 'bg-emerald-900/30 border-emerald-500/50 text-emerald-500' : 'border-transparent text-slate-400 hover:bg-slate-700'}`}
                 >
                   <div className="font-bold">Optimistic</div>
                   <div className="text-[10px] opacity-70">High growth, low inflation</div>
                 </button>
                 <button
                   onClick={() => setSimMode('balanced')}
-                  className={`text-left px-3 py-2 rounded-lg text-[12px] transition-colors border ${simMode === 'balanced' ? 'bg-[#3b82f6]/10 border-[#3b82f6]/30 text-[#3b82f6]' : 'border-transparent text-[#8A9BBF] hover:bg-white/5'}`}
+                  className={`text-left px-3 py-2 rounded text-xs transition-colors border ${simMode === 'balanced' ? 'bg-blue-900/30 border-blue-500/50 text-blue-500' : 'border-transparent text-slate-400 hover:bg-slate-700'}`}
                 >
                   <div className="font-bold">Balanced</div>
                   <div className="text-[10px] opacity-70">Realistic historical averages</div>
                 </button>
                 <button
                   onClick={() => setSimMode('stress-test')}
-                  className={`text-left px-3 py-2 rounded-lg text-[12px] transition-colors border ${simMode === 'stress-test' ? 'bg-[#f97316]/10 border-[#f97316]/30 text-[#f97316]' : 'border-transparent text-[#8A9BBF] hover:bg-white/5'}`}
+                  className={`text-left px-3 py-2 rounded text-xs transition-colors border ${simMode === 'stress-test' ? 'bg-amber-900/30 border-amber-500/50 text-amber-500' : 'border-transparent text-slate-400 hover:bg-slate-700'}`}
                 >
                   <div className="font-bold">Stress-Test</div>
                   <div className="text-[10px] opacity-70">Cynical, crashes, high inflation</div>
@@ -184,7 +184,7 @@ export default function Simulator() {
             {mode === 'preset' ? (
               <>
                 <div>
-                  <h3 className="text-[11px] uppercase tracking-widest text-[#566580] font-bold mb-4">Choose a scenario</h3>
+                  <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-4">Choose a scenario</h3>
                   <div className="flex flex-col">
                     {SCENARIOS.map(s => (
                       <ScenarioCard
@@ -198,9 +198,9 @@ export default function Simulator() {
                 </div>
 
                 <div>
-                  <h3 className="text-[11px] uppercase tracking-widest text-[#566580] font-bold mb-4">Simulation Horizon</h3>
+                  <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-4">Simulation Horizon</h3>
                   <div className="relative pt-6 pb-2">
-                    <div className="absolute top-0 text-[11px] text-[#00E5B8] font-bold bg-[#00E5B8]/10 px-2 py-1 rounded transition-all"
+                    <div className="absolute top-0 text-[10px] text-blue-500 font-bold bg-blue-900/30 px-2 py-1 rounded transition-all"
                          style={{ left: `calc(${((horizonYears - 5) / 25) * 100}% - 20px)` }}>
                       {horizonYears} yrs
                     </div>
@@ -209,24 +209,23 @@ export default function Simulator() {
                       min="5" max="30" step="1"
                       value={horizonYears}
                       onChange={(e) => setHorizonYears(parseInt(e.target.value))}
-                      className="w-full accent-[#00E5B8] h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer"
-                      style={{ accentColor: '#00E5B8' }}
+                      className="w-full accent-blue-500 h-2 bg-slate-700 rounded cursor-pointer"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-[11px] uppercase tracking-widest text-[#566580] font-bold mb-4">Scenario Parameters</h3>
-                  <div className="bg-[#0F1520] border border-white/5 rounded-xl p-4">
-                    <p className="text-[12px] text-[#8A9BBF] mb-4">{activePreset?.description}</p>
-                    <div className="space-y-2 text-[11px]">
+                  <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-4">Scenario Parameters</h3>
+                  <div className="bg-slate-800 border border-slate-700 rounded p-4 shadow-sm">
+                    <p className="text-xs text-slate-400 mb-4">{activePreset?.description}</p>
+                    <div className="space-y-2 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-[#566580]">Risk Multiplier</span>
-                        <span className="text-[#EEF2FF] font-semibold">1.0x</span>
+                        <span className="text-slate-400">Risk Multiplier</span>
+                        <span className="text-slate-200 font-semibold">1.0x</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[#566580]">Contribution Impact</span>
-                        <span className="text-[#EEF2FF] font-semibold">
+                        <span className="text-slate-400">Contribution Impact</span>
+                        <span className="text-slate-200 font-semibold">
                           {selectedScenario === 'pauseSIP' ? '-100% (24 mo)' : selectedScenario === 'doubleSIP' ? '+100% (Perm)' : '-100% (6 mo)'}
                         </span>
                       </div>
@@ -238,15 +237,15 @@ export default function Simulator() {
                   <button
                     onClick={handleRunPreset}
                     disabled={isSimulating}
-                    className="w-full bg-[#00E5B8] hover:bg-[#00C29A] text-[#080C14] font-bold py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-70"
+                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-70"
                   >
                     {isSimulating ? (
-                      <div className="w-5 h-5 border-2 border-[#080C14] border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     ) : (
                       <>Run Simulation <span className="text-lg">→</span></>
                     )}
                   </button>
-                  <p className="text-[11px] text-[#566580] text-center mt-3">10,000 Monte Carlo iterations</p>
+                  <p className="text-[10px] text-slate-500 text-center mt-3 uppercase tracking-widest">10,000 Monte Carlo iterations</p>
                 </div>
               </>
             ) : (
@@ -261,32 +260,32 @@ export default function Simulator() {
           {/* Center (flex-1) */}
           <div className="flex-1 flex flex-col min-w-0 gap-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-[16px] font-semibold text-[#EEF2FF]">Future Net Worth Projection</h2>
-              <div className="flex items-center gap-4 text-[11px] font-semibold text-[#566580]">
+              <h2 className="text-lg font-bold tracking-tight text-slate-50">Future Net Worth Projection</h2>
+              <div className="flex items-center gap-4 text-xs font-semibold text-slate-400">
                 {globalYMax > 0 && (
                   <button 
                     onClick={() => setGlobalYMax(0)}
-                    className="mr-2 px-2 py-1 bg-white/5 hover:bg-white/10 rounded border border-white/10 transition-colors"
+                    className="mr-2 px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded border border-slate-600 transition-colors"
                   >
                     ⟲ Reset Scale
                   </button>
                 )}
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#22D3A5]"></span> P90</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#3b82f6]"></span> P50</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#FF4D4D]"></span> P10</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> P90</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span> P50</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500"></span> P10</span>
               </div>
             </div>
 
             {hasNewFormat ? (
-              <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-6 shadow-xl flex-1 flex flex-col min-h-[500px]">
+              <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm flex-1 flex flex-col min-h-[500px]">
                 <div className="flex-1" style={{ minHeight: '350px' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData} margin={{ top: 10, right: 10, bottom: 0, left: -10 }}>
-                      <CartesianGrid stroke="rgba(255,255,255,0.03)" vertical={false} />
-                      <XAxis dataKey="year" tick={{ fill: '#566580', fontSize: 10 }} tickLine={false} axisLine={false} />
-                      <YAxis domain={yDomain} tickFormatter={v => `₹${(v/100000).toFixed(0)}L`} tick={{ fill: '#566580', fontSize: 10 }} tickLine={false} axisLine={false} />
+                      <CartesianGrid stroke="rgba(148, 163, 184, 0.1)" vertical={false} />
+                      <XAxis dataKey="year" tick={{ fill: '#94A3B8', fontSize: 10 }} tickLine={false} axisLine={false} />
+                      <YAxis domain={yDomain} tickFormatter={v => `₹${(v/100000).toFixed(0)}L`} tick={{ fill: '#94A3B8', fontSize: 10 }} tickLine={false} axisLine={false} />
                       <RechartsTooltip
-                        contentStyle={{ background: '#080C14', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '12px' }}
+                        contentStyle={{ background: '#1E293B', border: '1px solid #334155', borderRadius: '4px', fontSize: '12px', color: '#F8FAFC' }}
                         formatter={v => [`₹${Number(v).toLocaleString('en-IN')}`, '']}
                       />
                       <Area type="monotone" dataKey="best" stroke="#22c55e" fill="#22c55e22" name="Best (90th %ile)" />
@@ -300,78 +299,78 @@ export default function Simulator() {
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-                  <div className="bg-gray-800/30 rounded-xl p-4 border border-[#FF4D4D]/10">
-                    <div className="text-[11px] text-[#566580] font-bold tracking-wider mb-1">WORST CASE</div>
-                    <div className="text-[18px] text-[#FF4D4D] font-bold">{formatINR(simulationResult.worstCase)}</div>
-                    <div className="text-[11px] text-[#8A9BBF] mt-1">10th percentile</div>
+                  <div className="bg-slate-900 rounded p-4 border border-rose-500/20">
+                    <div className="text-[10px] text-slate-400 font-bold tracking-widest mb-1 uppercase">Worst Case</div>
+                    <div className="text-lg text-rose-500 font-bold">{formatINR(simulationResult.worstCase)}</div>
+                    <div className="text-xs text-slate-500 mt-1">10th percentile</div>
                   </div>
-                  <div className={`bg-gray-800/30 rounded-xl p-4 border ${theme.border}`}>
-                    <div className="text-[11px] text-[#566580] font-bold tracking-wider mb-1">MEDIAN</div>
-                    <div className="text-[18px] font-bold" style={{ color: theme.main }}>{formatINR(simulationResult.median)}</div>
-                    <div className="text-[11px] text-[#8A9BBF] mt-1">50th percentile</div>
+                  <div className={`bg-slate-900 rounded p-4 border ${theme.border}`}>
+                    <div className="text-[10px] text-slate-400 font-bold tracking-widest mb-1 uppercase">Median</div>
+                    <div className="text-lg font-bold" style={{ color: theme.main }}>{formatINR(simulationResult.median)}</div>
+                    <div className="text-xs text-slate-500 mt-1">50th percentile</div>
                   </div>
-                  <div className="bg-gray-800/30 rounded-xl p-4 border border-[#22D3A5]/10">
-                    <div className="text-[11px] text-[#566580] font-bold tracking-wider mb-1">BEST CASE</div>
-                    <div className="text-[18px] text-[#22D3A5] font-bold">{formatINR(simulationResult.bestCase)}</div>
-                    <div className="text-[11px] text-[#8A9BBF] mt-1">90th percentile</div>
+                  <div className="bg-slate-900 rounded p-4 border border-emerald-500/20">
+                    <div className="text-[10px] text-slate-400 font-bold tracking-widest mb-1 uppercase">Best Case</div>
+                    <div className="text-lg text-emerald-500 font-bold">{formatINR(simulationResult.bestCase)}</div>
+                    <div className="text-xs text-slate-500 mt-1">90th percentile</div>
                   </div>
                 </div>
 
                 {/* Success Rate Badge */}
-                <div className="mt-4 bg-[#141B28] rounded-xl p-4 border border-white/5 flex items-center justify-between">
+                <div className="mt-4 bg-slate-900 rounded p-4 border border-slate-700 flex items-center justify-between">
                   <div>
-                    <span className="text-[12px] text-[#566580] font-semibold">Simulation Success Rate</span>
-                    <p className="text-[11px] text-[#8A9BBF] mt-1">of {simulationResult.simulations?.toLocaleString()} simulations end positive</p>
+                    <span className="text-sm text-slate-200 font-semibold">Simulation Success Rate</span>
+                    <p className="text-xs text-slate-500 mt-1">of {simulationResult.simulations?.toLocaleString()} simulations end positive</p>
                   </div>
-                  <span className="text-[24px] font-bold" style={{
-                    color: simulationResult.successRate >= 0.8 ? '#22c55e' : simulationResult.successRate >= 0.5 ? '#f59e0b' : '#ef4444'
+                  <span className="text-2xl font-bold" style={{
+                    color: simulationResult.successRate >= 0.8 ? '#10B981' : simulationResult.successRate >= 0.5 ? '#F59E0B' : '#EF4444'
                   }}>
                     {(simulationResult.successRate * 100).toFixed(1)}%
                   </span>
                 </div>
               </div>
             ) : simulationResult ? (
-              <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-6 shadow-xl flex-1 flex flex-col min-h-[500px]">
+              <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm flex-1 flex flex-col min-h-[500px]">
                 {/* Legacy PercentileBandsChart */}
                 <div className="flex-1">
                   <PercentileBandsChart data={simulationResult} />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-                  <div className="bg-gray-800/30 rounded-xl p-4 border border-[#FF4D4D]/10">
-                    <div className="text-[11px] text-[#566580] font-bold tracking-wider mb-1">DOWNSIDE (P10)</div>
-                    <div className="text-[18px] text-[#FF4D4D] font-bold">{formatINR(simulationResult.p10[simulationResult.years.length - 1])}</div>
+                  <div className="bg-slate-900 rounded p-4 border border-rose-500/20">
+                    <div className="text-[10px] text-slate-400 font-bold tracking-widest mb-1 uppercase">DOWNSIDE (P10)</div>
+                    <div className="text-lg text-rose-500 font-bold">{formatINR(simulationResult.p10[simulationResult.years.length - 1])}</div>
                   </div>
-                  <div className="bg-gray-800/30 rounded-xl p-4 border border-[#00E5B8]/20">
-                    <div className="text-[11px] text-[#566580] font-bold tracking-wider mb-1">EXPECTED (P50)</div>
-                    <div className="text-[18px] text-[#00E5B8] font-bold">{formatINR(simulationResult.p50[simulationResult.years.length - 1])}</div>
+                  <div className="bg-slate-900 rounded p-4 border border-blue-500/20">
+                    <div className="text-[10px] text-slate-400 font-bold tracking-widest mb-1 uppercase">EXPECTED (P50)</div>
+                    <div className="text-lg text-blue-500 font-bold">{formatINR(simulationResult.p50[simulationResult.years.length - 1])}</div>
                   </div>
-                  <div className="bg-gray-800/30 rounded-xl p-4 border border-[#22D3A5]/10">
-                    <div className="text-[11px] text-[#566580] font-bold tracking-wider mb-1">UPSIDE (P90)</div>
-                    <div className="text-[18px] text-[#22D3A5] font-bold">{formatINR(simulationResult.p90[simulationResult.years.length - 1])}</div>
+                  <div className="bg-slate-900 rounded p-4 border border-emerald-500/20">
+                    <div className="text-[10px] text-slate-400 font-bold tracking-widest mb-1 uppercase">UPSIDE (P90)</div>
+                    <div className="text-lg text-emerald-500 font-bold">{formatINR(simulationResult.p90[simulationResult.years.length - 1])}</div>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-[#0F1520] border border-white/5 rounded-2xl shadow-xl flex-1 flex items-center justify-center min-h-[500px]">
-                <p className="text-[#566580] text-sm">Select a scenario and click Run Simulation</p>
+              <div className="bg-slate-800 border border-slate-700 rounded shadow-sm flex-1 flex items-center justify-center min-h-[500px]">
+                <p className="text-slate-400 text-sm">Select a scenario and click Run Simulation</p>
               </div>
             )}
 
             {/* What-If Comparison */}
             {simulationResult && hasNewFormat && (
-              <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-6 shadow-xl">
+              <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[14px] font-semibold text-[#EEF2FF]">What-If Comparison</h3>
+                  <h3 className="text-sm font-semibold text-slate-100">What-If Comparison</h3>
                   <div className="flex gap-2">
                     <button
                       onClick={handleSetBaseline}
-                      className="bg-[#1A2235] text-[#8A9BBF] hover:text-[#EEF2FF] text-[11px] font-semibold px-4 py-2 rounded-lg border border-white/5 transition-colors"
+                      className="bg-slate-900 text-slate-400 hover:text-slate-200 text-xs font-semibold px-4 py-2 rounded border border-slate-700 transition-colors"
                     >
                       Set as Baseline
                     </button>
                     <button
                       onClick={handleCompareNew}
-                      className="bg-[#00E5B8]/10 text-[#00E5B8] text-[11px] font-semibold px-4 py-2 rounded-lg border border-[#00E5B8]/20 transition-colors hover:bg-[#00E5B8]/20"
+                      className="bg-blue-900/30 text-blue-500 text-xs font-semibold px-4 py-2 rounded border border-blue-500/50 transition-colors hover:bg-blue-900/50"
                     >
                       Compare New Scenario
                     </button>
@@ -381,21 +380,21 @@ export default function Simulator() {
                   <div style={{ height: '200px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={comparisonData}>
-                        <CartesianGrid stroke="rgba(255,255,255,0.03)" vertical={false} />
-                        <XAxis dataKey="year" tick={{ fill: '#566580', fontSize: 10 }} tickLine={false} axisLine={false} />
-                        <YAxis domain={yDomain} tickFormatter={v => `₹${(v/100000).toFixed(0)}L`} tick={{ fill: '#566580', fontSize: 10 }} tickLine={false} axisLine={false} />
-                        <Line dataKey="baseline" stroke="#6366f1" name="Baseline" strokeDasharray="5 5" />
-                        <Line dataKey="scenario" stroke="#22c55e" name="Your Scenario" strokeWidth={2} />
+                        <CartesianGrid stroke="rgba(148, 163, 184, 0.1)" vertical={false} />
+                        <XAxis dataKey="year" tick={{ fill: '#94A3B8', fontSize: 10 }} tickLine={false} axisLine={false} />
+                        <YAxis domain={yDomain} tickFormatter={v => `₹${(v/100000).toFixed(0)}L`} tick={{ fill: '#94A3B8', fontSize: 10 }} tickLine={false} axisLine={false} />
+                        <Line dataKey="baseline" stroke="#94A3B8" name="Baseline" strokeDasharray="5 5" />
+                        <Line dataKey="scenario" stroke="#3B82F6" name="Your Scenario" strokeWidth={2} />
                         <Legend />
                         <RechartsTooltip
-                          contentStyle={{ background: '#080C14', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '12px' }}
+                          contentStyle={{ background: '#1E293B', border: '1px solid #334155', borderRadius: '4px', fontSize: '12px', color: '#F8FAFC' }}
                           formatter={v => [`₹${v?.toLocaleString('en-IN')}`, '']}
                         />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <p className="text-[12px] text-[#566580] text-center py-4">Run a simulation, then click "Set as Baseline" to compare scenarios</p>
+                  <p className="text-xs text-slate-500 text-center py-4">Run a simulation, then click "Set as Baseline" to compare scenarios</p>
                 )}
               </div>
             )}

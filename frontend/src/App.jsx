@@ -6,25 +6,29 @@ import InvestmentManager from './pages/InvestmentManager';
 import RebalanceAdvisor from './pages/RebalanceAdvisor';
 import Projections from './pages/Projections';
 import TaxOptimizer from './pages/TaxOptimizer';
-import Navbar from './components/layout/Navbar';
+import Methodology from './pages/Methodology';
+import Sidebar from './components/layout/Sidebar';
 
 function AppContent() {
   const location = useLocation();
   const showNav = location.pathname !== '/';
 
   return (
-    <>
-      {showNav && <Navbar />}
-      <Routes>
-        <Route path="/" element={<Onboarding />} />
-        <Route path="/twin" element={<Dashboard />} />
-        <Route path="/simulator" element={<Simulator />} />
-        <Route path="/investments" element={<InvestmentManager />} />
-        <Route path="/rebalance" element={<RebalanceAdvisor />} />
-        <Route path="/projections" element={<Projections />} />
-        <Route path="/tax" element={<TaxOptimizer />} />
-      </Routes>
-    </>
+    <div className="flex bg-slate-900 min-h-screen">
+      {showNav && <Sidebar />}
+      <main className={`flex-1 ${showNav ? 'md:ml-64' : ''} bg-slate-900`}>
+        <Routes>
+          <Route path="/" element={<Onboarding />} />
+          <Route path="/twin" element={<Dashboard />} />
+          <Route path="/simulator" element={<Simulator />} />
+          <Route path="/investments" element={<InvestmentManager />} />
+          <Route path="/rebalance" element={<RebalanceAdvisor />} />
+          <Route path="/projections" element={<Projections />} />
+          <Route path="/tax" element={<TaxOptimizer />} />
+          <Route path="/methodology" element={<Methodology />} />
+        </Routes>
+      </main>
+    </div>
   );
 }
 

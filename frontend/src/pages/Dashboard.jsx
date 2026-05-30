@@ -91,11 +91,11 @@ export default function Dashboard() {
 
   if (!twinState) {
     return (
-      <div className="min-h-screen bg-[#080C14] text-[#EEF2FF]">
+      <div className="min-h-screen bg-slate-900 text-slate-50">
         <div className="p-8 max-w-4xl mx-auto flex flex-col items-center justify-center mt-20">
-          <div className="w-12 h-12 border-4 border-[#00E5B8] border-t-transparent rounded-full animate-spin mb-6"></div>
-          <h2 className="text-xl font-semibold text-[#EEF2FF] mb-8">Your financial twin is being built...</h2>
-          <div className="w-full max-w-2xl bg-[#0F1520] p-8 rounded-2xl border border-white/5">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+          <h2 className="text-xl font-semibold text-slate-100 mb-8">Compiling Institutional Profile...</h2>
+          <div className="w-full max-w-2xl bg-slate-800 p-8 rounded border border-slate-700">
             <LoadingSkeleton rows={5} height={24} />
           </div>
         </div>
@@ -104,22 +104,27 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080C14] text-[#EEF2FF] font-sans pb-16">
+    <div className="min-h-screen bg-slate-900 text-slate-50 font-sans pb-16">
       
-      <div className="max-w-[1400px] mx-auto p-4 sm:p-6 md:p-8">
-        <h1 className="text-2xl font-bold mb-6">Twin Dashboard</h1>
+      <div className="w-full px-6 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-50">Overview</h1>
+            <p className="text-sm text-slate-400 mt-1">Institutional Financial Terminal</p>
+          </div>
+        </div>
 
         {twinState?.isSandboxMode && (
-          <div className="w-full bg-[#F5A623]/10 border border-[#F5A623]/30 rounded-xl p-4 mb-6 flex items-center gap-3">
-            <span className="text-xl">⚠️</span>
-            <p className="text-[#F5A623] text-[14px] font-medium">
-              Offline Sandbox Mode: The backend server was unreachable. Your profile and twin characteristics are being calculated locally in your browser.
+          <div className="w-full bg-rose-900/20 border border-rose-500/50 rounded p-4 mb-6 flex items-center gap-3">
+            <span className="text-rose-500">⚠</span>
+            <p className="text-rose-400 text-sm font-medium">
+              SYSTEM OFFLINE: Connection to quantitative backend lost. Displaying cached data.
             </p>
           </div>
         )}
         
-        <div className="flex flex-col lg:flex-row gap-[24px]">
-          <div className="w-full lg:w-[60%] flex flex-col gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="w-full lg:w-[65%] flex flex-col gap-6">
             <PersonalityCard twinState={twinState} />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -127,32 +132,32 @@ export default function Dashboard() {
                 label="Portfolio Value"
                 value={formatINR(metrics.totalAssets)}
                 subtext={`${metrics.gainPct >= 0 ? '+' : ''}${metrics.gainPct.toFixed(1)}% returns`}
-                subtextColor={metrics.gainPct >= 0 ? 'green' : 'red'}
+                subtextColor={metrics.gainPct >= 0 ? 'emerald' : 'rose'}
               />
               <MetricCard 
                 label="Monthly Surplus"
                 value={formatINR(metrics.netSurplus)}
                 subtext="Available to invest"
-                subtextColor={metrics.netSurplus >= 0 ? 'green' : 'red'}
+                subtextColor={metrics.netSurplus >= 0 ? 'emerald' : 'rose'}
               />
               <MetricCard 
                 label="Savings Rate"
                 value={`${metrics.savingsRate}%`}
                 subtext={Number(metrics.savingsRate) >= 25 ? '↑ above 25% target' : '↓ below 25% target'}
-                subtextColor={Number(metrics.savingsRate) >= 25 ? 'green' : 'amber'}
+                subtextColor={Number(metrics.savingsRate) >= 25 ? 'emerald' : 'amber'}
               />
               <MetricCard 
                 label="Retirement Corpus (Age 60)"
                 value={`₹${(metrics.futureCorpus / 10000000).toFixed(2)} Cr`}
                 subtext={`In ${metrics.yearsToRetirement} years at 12% p.a.`}
-                subtextColor="green"
+                subtextColor="emerald"
               />
             </div>
 
             {/* Milestone Tracker */}
-            <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-6 shadow-xl">
+            <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
-                <h3 className="text-[14px] text-[#EEF2FF] font-semibold">Milestone Tracker</h3>
+                <h3 className="text-sm text-slate-100 font-semibold tracking-wide uppercase">Strategic Milestones</h3>
               </div>
               <div className="space-y-6">
                 
@@ -166,17 +171,17 @@ export default function Dashboard() {
                     <div>
                       <div className="flex justify-between items-end mb-2">
                         <div>
-                          <p className="text-[13px] font-semibold text-[#EEF2FF]">Emergency Fund</p>
-                          <p className="text-[11px] text-[#566580]">6 months of expenses</p>
+                          <p className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Emergency Fund</p>
+                          <p className="text-[11px] text-slate-400">6 months of expenses</p>
                         </div>
                         <div className="text-right">
-                          <span className={`text-[13px] font-bold ${isEmergReady ? 'text-[#00E5B8]' : 'text-[#F5A623]'}`}>
+                          <span className={`text-xs font-bold ${isEmergReady ? 'text-emerald-500' : 'text-amber-500'}`}>
                             {formatINR(currentSavings)} / {formatINR(targetEmergency)}
                           </span>
                         </div>
                       </div>
-                      <div className="w-full h-2 bg-[#1A2235] rounded-full overflow-hidden">
-                        <div className={`h-full ${isEmergReady ? 'bg-[#00E5B8]' : 'bg-[#F5A623]'} rounded-full`} style={{ width: `${emergencyPct}%` }}></div>
+                      <div className="w-full h-1.5 bg-slate-900 rounded overflow-hidden">
+                        <div className={`h-full ${isEmergReady ? 'bg-emerald-500' : 'bg-amber-500'} rounded`} style={{ width: `${emergencyPct}%` }}></div>
                       </div>
                     </div>
                   );
@@ -191,17 +196,17 @@ export default function Dashboard() {
                     <div>
                       <div className="flex justify-between items-end mb-2">
                         <div>
-                          <p className="text-[13px] font-semibold text-[#EEF2FF]">The First Crore</p>
-                          <p className="text-[11px] text-[#566580]">Next capital milestone</p>
+                          <p className="text-xs font-semibold text-slate-200 uppercase tracking-wider">The First Crore</p>
+                          <p className="text-[11px] text-slate-400">Next capital milestone</p>
                         </div>
                         <div className="text-right">
-                          <span className="text-[13px] font-bold text-[#8B7FFF]">
+                          <span className="text-xs font-bold text-blue-500">
                             {formatINR(currentPort)} / {formatINR(targetMilestone)}
                           </span>
                         </div>
                       </div>
-                      <div className="w-full h-2 bg-[#1A2235] rounded-full overflow-hidden">
-                        <div className="h-full bg-[#8B7FFF] rounded-full" style={{ width: `${milestonePct}%` }}></div>
+                      <div className="w-full h-1.5 bg-slate-900 rounded overflow-hidden">
+                        <div className="h-full bg-blue-500 rounded" style={{ width: `${milestonePct}%` }}></div>
                       </div>
                     </div>
                   );
@@ -216,17 +221,17 @@ export default function Dashboard() {
                     <div>
                       <div className="flex justify-between items-end mb-2">
                         <div>
-                          <p className="text-[13px] font-semibold text-[#EEF2FF]">Retirement Timeline</p>
-                          <p className="text-[11px] text-[#566580]">Target Age {targetAge}</p>
+                          <p className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Retirement Horizon</p>
+                          <p className="text-[11px] text-slate-400">Target Age {targetAge}</p>
                         </div>
                         <div className="text-right">
-                          <span className="text-[13px] font-bold text-[#00E5B8]">
+                          <span className="text-xs font-bold text-emerald-500">
                             {Math.max(0, targetAge - currentAge)} years to go
                           </span>
                         </div>
                       </div>
-                      <div className="w-full h-2 bg-[#1A2235] rounded-full overflow-hidden">
-                        <div className="h-full bg-[#00E5B8] rounded-full" style={{ width: `${retirementPct}%` }}></div>
+                      <div className="w-full h-1.5 bg-slate-900 rounded overflow-hidden">
+                        <div className="h-full bg-emerald-500 rounded" style={{ width: `${retirementPct}%` }}></div>
                       </div>
                     </div>
                   );
@@ -237,70 +242,70 @@ export default function Dashboard() {
             <HealthScore />
           </div>
 
-          <div className="w-full lg:w-[40%] flex flex-col gap-6">
-            <div className="bg-[#0F1520] rounded-2xl p-6 border border-white/5 shadow-xl">
+          <div className="w-full lg:w-[35%] flex flex-col gap-6">
+            <div className="bg-slate-800 rounded p-6 border border-slate-700 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
-                <div className="w-2 h-2 rounded-full bg-[#22D3A5] animate-pulse"></div>
-                <h2 className="text-[#00E5B8] text-[11px] uppercase tracking-widest font-bold">Live Financial Snapshot</h2>
+                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                <h2 className="text-slate-300 text-xs uppercase tracking-widest font-semibold">Live Snapshot</h2>
               </div>
 
-              <div className="space-y-4 text-[14px]">
+              <div className="space-y-4 text-sm font-medium">
                 <div className="flex justify-between">
-                  <span className="text-[#566580]">Monthly Income</span>
-                  <span className="text-[#EEF2FF] font-medium">{formatINR(metrics.income)}</span>
+                  <span className="text-slate-400">Monthly Income</span>
+                  <span className="text-slate-50">{formatINR(metrics.income)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#566580]">Fixed Expenses</span>
-                  <span className="text-[#FF4D4D] font-medium">-{formatINR(metrics.fixedExpenses)}</span>
+                  <span className="text-slate-400">Fixed Expenses</span>
+                  <span className="text-rose-500">-{formatINR(metrics.fixedExpenses)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#566580]">Variable Spend</span>
-                  <span className="text-[#F5A623] font-medium">-{formatINR(metrics.variableSpend)}</span>
+                  <span className="text-slate-400">Variable Spend</span>
+                  <span className="text-amber-500">-{formatINR(metrics.variableSpend)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#566580]">EMIs</span>
-                  <span className="text-[#F5A623] font-medium">-{formatINR(metrics.emis)}</span>
+                  <span className="text-slate-400">EMIs</span>
+                  <span className="text-amber-500">-{formatINR(metrics.emis)}</span>
                 </div>
                 
-                <div className="border-b border-white/5 my-2"></div>
+                <div className="border-b border-slate-700 my-2"></div>
                 
                 <div className="flex justify-between items-center py-1">
-                  <span className="text-[#EEF2FF] font-semibold">Net Surplus</span>
-                  <span className={`font-bold text-[16px] ${metrics.netSurplus >= 0 ? 'text-[#00E5B8]' : 'text-[#FF4D4D]'}`}>{formatINR(metrics.netSurplus)}</span>
+                  <span className="text-slate-200">Net Surplus</span>
+                  <span className={`font-bold text-base ${metrics.netSurplus >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>{formatINR(metrics.netSurplus)}</span>
                 </div>
 
-                <div className="border-b border-white/5 my-2"></div>
+                <div className="border-b border-slate-700 my-2"></div>
 
                 <div className="flex justify-between">
-                  <span className="text-[#566580]">Equity Portfolio</span>
-                  <span className="text-[#EEF2FF] font-medium">{formatINR(metrics.assetBreakdown.Equity)}</span>
+                  <span className="text-slate-400">Equity Portfolio</span>
+                  <span className="text-slate-50">{formatINR(metrics.assetBreakdown.Equity)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#566580]">Debt Portfolio</span>
-                  <span className="text-[#EEF2FF] font-medium">{formatINR(metrics.assetBreakdown.Debt)}</span>
+                  <span className="text-slate-400">Debt Portfolio</span>
+                  <span className="text-slate-50">{formatINR(metrics.assetBreakdown.Debt)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#566580]">Gold</span>
-                  <span className="text-[#EEF2FF] font-medium">{formatINR(metrics.assetBreakdown.Gold)}</span>
+                  <span className="text-slate-400">Gold</span>
+                  <span className="text-slate-50">{formatINR(metrics.assetBreakdown.Gold)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[#566580] flex items-center gap-2">Crypto <div className="w-1.5 h-1.5 rounded-full bg-[#FF4D4D]"></div></span>
-                  <span className="text-[#EEF2FF] font-medium">{formatINR(metrics.assetBreakdown.Crypto)}</span>
+                  <span className="text-slate-400 flex items-center gap-2">Crypto</span>
+                  <span className="text-slate-50">{formatINR(metrics.assetBreakdown.Crypto)}</span>
                 </div>
 
-                <div className="border-b border-white/5 my-2"></div>
+                <div className="border-b border-slate-700 my-2"></div>
                 
                 <div className="flex justify-between">
-                  <span className="text-[#566580]">Total Invested</span>
-                  <span className="text-[#EEF2FF] font-medium">{formatINR(metrics.totalInvested)}</span>
+                  <span className="text-slate-400">Total Invested</span>
+                  <span className="text-slate-50">{formatINR(metrics.totalInvested)}</span>
                 </div>
                 <div className="flex justify-between items-center py-1">
-                  <span className="text-[#EEF2FF] font-semibold">Current Value</span>
-                  <span className="text-[#22D3A5] font-bold text-[16px]">{formatINR(metrics.totalAssets)}</span>
+                  <span className="text-slate-200">Current Value</span>
+                  <span className="text-blue-500 font-bold text-base">{formatINR(metrics.totalAssets)}</span>
                 </div>
                 <div className="flex justify-between pt-1">
-                  <span className="text-[#566580]">Total Returns</span>
-                  <span className="text-[#22D3A5] font-semibold text-[13px] bg-[#22D3A5]/10 px-2 py-0.5 rounded">
+                  <span className="text-slate-400">Total Returns</span>
+                  <span className="text-emerald-500 font-semibold text-xs bg-emerald-900/30 px-2 py-0.5 rounded">
                     {metrics.totalGain >= 0 ? '+' : ''}{formatINR(metrics.totalGain)} ({metrics.gainPct >= 0 ? '+' : ''}{metrics.gainPct.toFixed(0)}%)
                   </span>
                 </div>
@@ -310,15 +315,15 @@ export default function Dashboard() {
             <div className="flex flex-col gap-3">
               <button 
                 onClick={() => navigate('/simulator')}
-                className="w-full bg-[#00E5B8] hover:bg-[#00C29A] text-[#080C14] font-bold py-4 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2"
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-6 rounded transition-colors duration-200 flex items-center justify-center gap-2"
               >
-                Run Simulation <span className="text-lg">→</span>
+                Launch Quant Simulator <span className="text-lg">→</span>
               </button>
               <button 
                 onClick={() => navigate('/')}
-                className="w-full bg-transparent border border-[#566580] hover:border-[#8A9BBF] text-[#EEF2FF] hover:bg-white/5 font-semibold py-4 px-6 rounded-xl transition-all duration-200"
+                className="w-full bg-slate-800 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-medium py-3 px-6 rounded transition-all duration-200"
               >
-                Update Twin Data
+                Reconfigure Parameters
               </button>
             </div>
 

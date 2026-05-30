@@ -24,20 +24,7 @@ export default function ReportModal({ profile, portfolio, simulationResult, heal
       <button
         onClick={generateReport}
         disabled={loading}
-        style={{
-          background: 'transparent',
-          border: '1px solid #566580',
-          color: '#EEF2FF',
-          fontWeight: 600,
-          padding: '10px 20px',
-          borderRadius: '12px',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          fontSize: '13px',
-          transition: 'all 0.2s',
-          width: '100%',
-        }}
-        onMouseOver={e => { if(!loading) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-        onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+        className={`w-full font-semibold py-2.5 px-4 rounded border transition-colors ${loading ? 'bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed' : 'bg-transparent border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white'}`}
       >
         {loading ? '⏳ Generating...' : '📄 Generate Financial Report'}
       </button>
@@ -45,29 +32,23 @@ export default function ReportModal({ profile, portfolio, simulationResult, heal
       {report && (
         <div
           id="printable-report"
-          style={{
-            marginTop: '16px',
-            background: '#0F1520',
-            border: '1px solid rgba(255,255,255,0.05)',
-            borderRadius: '16px',
-            padding: '24px',
-          }}
+          className="mt-4 bg-slate-800 border border-slate-700 rounded p-6 shadow-sm"
         >
-          <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#00E5B8', marginBottom: '4px' }}>FinTwin Financial Report</h2>
-            <p style={{ fontSize: '12px', color: '#566580' }}>{report.reportDate}</p>
-            <h3 style={{ fontSize: '14px', color: '#EEF2FF', marginTop: '8px' }}>
+          <div className="text-center mb-5 pb-4 border-b border-slate-700">
+            <h2 className="text-lg font-bold text-blue-500 mb-1">FinTwin Financial Report</h2>
+            <p className="text-xs text-slate-500">{report.reportDate}</p>
+            <h3 className="text-sm text-slate-100 mt-2">
               {report.profile?.name || 'User'}'s Financial Twin Analysis
             </h3>
           </div>
 
           {report.healthScore && (
-            <div style={{ marginBottom: '16px' }}>
-              <h4 style={{ fontSize: '13px', color: '#00E5B8', fontWeight: 600, marginBottom: '8px' }}>
+            <div className="mb-4">
+              <h4 className="text-sm text-blue-500 font-semibold mb-2">
                 Financial Health Score: {report.healthScore.totalScore}/100 (Grade: {report.healthScore.grade})
               </h4>
               {report.healthScore.breakdown?.map((b, i) => (
-                <div key={i} style={{ fontSize: '12px', color: '#8A9BBF', marginBottom: '4px' }}>
+                <div key={i} className="text-xs text-slate-400 mb-1">
                   {b.category}: {b.score}/{b.max} — {b.message}
                 </div>
               ))}
@@ -75,36 +56,25 @@ export default function ReportModal({ profile, portfolio, simulationResult, heal
           )}
 
           {report.simulationResult && (
-            <div style={{ marginBottom: '16px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '12px' }}>
-              <h4 style={{ fontSize: '13px', color: '#00E5B8', fontWeight: 600, marginBottom: '8px' }}>Projection Summary</h4>
-              <p style={{ fontSize: '12px', color: '#8A9BBF' }}>
-                Median Outcome: ₹{Number(report.simulationResult.median || 0).toLocaleString('en-IN')}
+            <div className="mb-4 border-t border-slate-700 pt-3">
+              <h4 className="text-sm text-blue-500 font-semibold mb-2">Projection Summary</h4>
+              <p className="text-xs text-slate-400">
+                Median Outcome: {formatINR(Number(report.simulationResult.median || 0))}
               </p>
-              <p style={{ fontSize: '12px', color: '#8A9BBF' }}>
+              <p className="text-xs text-slate-400">
                 Success Rate: {report.simulationResult.successRate ? (report.simulationResult.successRate * 100).toFixed(1) : 'N/A'}%
               </p>
             </div>
           )}
 
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '12px' }}>
-            <h4 style={{ fontSize: '13px', color: '#00E5B8', fontWeight: 600, marginBottom: '8px' }}>AI Analysis</h4>
-            <p style={{ fontSize: '12px', color: '#8A9BBF', lineHeight: 1.6 }}>{report.narrative}</p>
+          <div className="border-t border-slate-700 pt-3">
+            <h4 className="text-sm text-blue-500 font-semibold mb-2">AI Analysis</h4>
+            <p className="text-xs text-slate-400 leading-relaxed">{report.narrative}</p>
           </div>
 
           <button
             onClick={printReport}
-            style={{
-              marginTop: '16px',
-              width: '100%',
-              background: '#00E5B8',
-              color: '#080C14',
-              fontWeight: 700,
-              padding: '12px',
-              borderRadius: '12px',
-              border: 'none',
-              fontSize: '14px',
-              cursor: 'pointer',
-            }}
+            className="mt-5 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded transition-colors"
           >
             🖨️ Print / Save as PDF
           </button>

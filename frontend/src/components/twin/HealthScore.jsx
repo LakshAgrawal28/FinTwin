@@ -31,16 +31,8 @@ export default function HealthScore() {
 
   if (loading) {
     return (
-      <div style={{
-        background: '#0F1520',
-        border: '1px solid rgba(255,255,255,0.05)',
-        borderRadius: '16px',
-        padding: '24px',
-        textAlign: 'center',
-        color: '#566580',
-        fontSize: '13px',
-      }}>
-        <div style={{ width: '24px', height: '24px', border: '3px solid #00E5B8', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 12px' }} />
+      <div className="bg-slate-800 border border-slate-700 rounded p-6 text-center text-slate-400 text-sm">
+        <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
         Calculating your score...
       </div>
     );
@@ -49,71 +41,48 @@ export default function HealthScore() {
   if (!healthScore) return null;
 
   const data = healthScore;
-  const gradeColor = gradeColors[data.grade] || '#566580';
+  const gradeColorClass = data.grade === 'A' ? 'text-emerald-500' : data.grade === 'B' ? 'text-blue-500' : data.grade === 'C' ? 'text-amber-500' : 'text-rose-500';
+  const gradeBorderClass = data.grade === 'A' ? 'border-emerald-500 bg-emerald-500/10' : data.grade === 'B' ? 'border-blue-500 bg-blue-500/10' : data.grade === 'C' ? 'border-amber-500 bg-amber-500/10' : 'border-rose-500 bg-rose-500/10';
 
   return (
-    <div style={{
-      background: '#0F1520',
-      border: '1px solid rgba(255,255,255,0.05)',
-      borderRadius: '16px',
-      padding: '24px',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-    }}>
+    <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm">
       {/* Score Circle */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '20px' }}>
-        <div style={{
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          border: `4px solid ${gradeColor}`,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: `${gradeColor}10`,
-          flexShrink: 0,
-        }}>
-          <span style={{ fontSize: '24px', fontWeight: 700, color: '#EEF2FF' }}>{data.totalScore}</span>
-          <span style={{ fontSize: '12px', fontWeight: 700, color: gradeColor }}>{data.grade}</span>
+      <div className="flex items-center gap-5 mb-5">
+        <div className={`w-20 h-20 rounded-full border-4 flex flex-col items-center justify-center shrink-0 ${gradeBorderClass}`}>
+          <span className="text-2xl font-bold text-slate-100">{data.totalScore}</span>
+          <span className={`text-xs font-bold ${gradeColorClass}`}>{data.grade}</span>
         </div>
         <div>
-          <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#EEF2FF', marginBottom: '4px' }}>Financial Health</h3>
-          <p style={{ fontSize: '11px', color: '#566580' }}>Score out of 100 across 5 key areas</p>
+          <h3 className="text-sm font-semibold text-slate-100 mb-1">Financial Health</h3>
+          <p className="text-xs text-slate-400">Score out of 100 across 5 key areas</p>
         </div>
       </div>
 
       {/* Breakdown */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
-        {data.breakdown?.map((item, i) => (
-          <div key={i}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-              <span style={{ color: '#8A9BBF', fontWeight: 500 }}>{item.category}</span>
-              <span style={{ color: '#EEF2FF', fontWeight: 600 }}>{item.score}/{item.max}</span>
+      <div className="flex flex-col gap-3 mb-5">
+        {data.breakdown?.map((item, i) => {
+          const ratio = item.score / item.max;
+          const barColorClass = ratio >= 0.7 ? 'bg-emerald-500' : ratio >= 0.4 ? 'bg-amber-500' : 'bg-rose-500';
+          return (
+            <div key={i}>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="text-slate-400 font-medium">{item.category}</span>
+                <span className="text-slate-100 font-semibold">{item.score}/{item.max}</span>
+              </div>
+              <div className="h-1 bg-slate-700 rounded overflow-hidden">
+                <div className={`h-full rounded transition-all duration-500 ${barColorClass}`} style={{ width: `${ratio * 100}%` }} />
+              </div>
+              <small className="text-[10px] text-slate-500 mt-1 block">{item.message}</small>
             </div>
-            <div style={{ height: '4px', background: '#1A2235', borderRadius: '4px', overflow: 'hidden' }}>
-              <div style={{
-                height: '100%',
-                width: `${(item.score / item.max) * 100}%`,
-                background: item.score / item.max >= 0.7 ? '#22c55e' : item.score / item.max >= 0.4 ? '#f59e0b' : '#ef4444',
-                borderRadius: '4px',
-                transition: 'width 0.6s ease',
-              }} />
-            </div>
-            <small style={{ fontSize: '10px', color: '#566580', marginTop: '2px', display: 'block' }}>{item.message}</small>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* AI Advice */}
       {data.aiAdvice && (
-        <div style={{
-          background: '#141B28',
-          borderRadius: '12px',
-          padding: '14px',
-          border: '1px solid rgba(0,229,184,0.1)',
-        }}>
-          <span style={{ fontSize: '11px', color: '#00E5B8', fontWeight: 700, display: 'block', marginBottom: '6px' }}>🤖 AI Advice</span>
-          <p style={{ fontSize: '12px', color: '#8A9BBF', lineHeight: 1.5, margin: 0 }}>{data.aiAdvice}</p>
+        <div className="bg-slate-700/50 rounded p-3.5 border border-slate-600">
+          <span className="text-xs text-blue-500 font-bold block mb-1.5">🤖 AI Advice</span>
+          <p className="text-xs text-slate-400 leading-relaxed m-0">{data.aiAdvice}</p>
         </div>
       )}
     </div>

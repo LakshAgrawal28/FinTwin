@@ -11,14 +11,14 @@ const formatAbbrev = (val) => {
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#0F1520] border border-white/10 p-4 rounded-lg shadow-xl">
-        <p className="text-[#8A9BBF] text-xs font-semibold mb-2">Year {label}</p>
+      <div className="bg-slate-800 border border-slate-700 p-4 rounded shadow-lg">
+        <p className="text-slate-400 text-xs font-semibold mb-2">Year {label}</p>
         {payload.map((entry, index) => (
           <div key={index} className="flex justify-between items-center gap-4 mb-1">
             <span className="text-[12px]" style={{ color: entry.color }}>
               {entry.name}:
             </span>
-            <span className="text-[13px] font-bold text-[#EEF2FF]">
+            <span className="text-[13px] font-bold text-slate-100">
               {formatINR(entry.value)}
             </span>
           </div>
@@ -49,12 +49,12 @@ const PercentileBandsChart = ({ data, dangerZoneThreshold = 500000, maxYears, in
     <div style={{ width: '100%', height: '100%' }}>
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 10 }}>
-          <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />
+          <CartesianGrid stroke="rgba(148,163,184,0.1)" vertical={false} />
           <XAxis 
             dataKey="year" 
             tickLine={false} 
             axisLine={false} 
-            tick={{ fill: '#566580', fontSize: 12 }} 
+            tick={{ fill: '#94A3B8', fontSize: 12 }} 
             dy={10}
             tickFormatter={(val) => `Yr ${val}`}
           />
@@ -62,36 +62,36 @@ const PercentileBandsChart = ({ data, dangerZoneThreshold = 500000, maxYears, in
             tickFormatter={formatAbbrev} 
             tickLine={false} 
             axisLine={false} 
-            tick={{ fill: '#566580', fontSize: 12 }} 
+            tick={{ fill: '#94A3B8', fontSize: 12 }} 
             dx={-10}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(148,163,184,0.05)' }} />
           <ReferenceLine 
             y={dangerZoneThreshold} 
-            stroke="#FF4D4D" 
+            stroke="#F43F5E" 
             strokeDasharray="4 4" 
-            label={{ position: 'insideTopLeft', value: 'Danger Zone', fill: '#FF4D4D', fontSize: 11, fontWeight: 600 }} 
+            label={{ position: 'insideTopLeft', value: 'Danger Zone', fill: '#F43F5E', fontSize: 11, fontWeight: 600 }} 
           />
           <Area 
             type="monotone" 
             dataKey="Top 10% (P90)" 
-            stroke="#22D3A5" 
+            stroke="#10B981" 
             strokeDasharray="4 4" 
-            fill="rgba(34,211,165,0.06)" 
+            fill="rgba(16,185,129,0.1)" 
           />
           <Area 
             type="monotone" 
             dataKey="Median (P50)" 
-            stroke="#00E5B8" 
+            stroke="#3B82F6" 
             strokeWidth={2} 
-            fill="rgba(0,229,184,0.12)" 
+            fill="rgba(59,130,246,0.15)" 
           />
           <Area 
             type="monotone" 
             dataKey="Bottom 10% (P10)" 
-            stroke="#FF4D4D" 
+            stroke="#F43F5E" 
             strokeDasharray="4 4" 
-            fill="rgba(255,77,77,0.06)" 
+            fill="rgba(244,63,94,0.1)" 
           />
         </ComposedChart>
       </ResponsiveContainer>

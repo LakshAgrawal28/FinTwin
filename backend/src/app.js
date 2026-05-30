@@ -24,20 +24,38 @@ const configuredOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173')
   .filter(Boolean);
 
 app.use(cors({
-  origin(origin, callback) {
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    const isConfigured = configuredOrigins.includes(origin);
-    const isVercelPreview = origin.endsWith('.vercel.app');
-    if (isConfigured || isVercelPreview) {
+    
+    // Check if it's a deployed preview/production URL or local
+    const isLocal = origin.includes('localhost') || origin.includes('127.0.0.1');
+    const isVercel = origin.includes('vercel.app');
+    const isRender = origin.includes('onrender.com');
+    const isConfigured = configuredOrigins.some(o => origin.startsWith(o));
+    
+    if (isLocal || isVercel || isRender || isConfigured) {
       return callback(null, true);
     }
+    
+    // In production, we might want to log rejected origins for debugging
+    console.warn(`CORS rejected origin: ${origin}`);
     return callback(new Error('Not allowed by CORS'));
   },
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json({ limit: '10mb' }));
+
+// Health Check Route for Deployment Verification
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'online',
+    service: 'FinTwin Institutional API',
+    timestamp: new Date().toISOString()
+  });
+});
 
 app.use('/api/profile', profileRouter);
 app.use('/api/simulate', simulateRouter);

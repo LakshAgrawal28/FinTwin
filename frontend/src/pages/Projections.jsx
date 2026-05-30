@@ -35,8 +35,7 @@ export default function Projections() {
 
   if (!projectionResult) {
     return (
-      <div className="min-h-screen bg-[#080C14] text-[#EEF2FF] font-sans pb-16">
-
+      <div className="min-h-screen bg-slate-900 text-slate-50 font-sans pb-16">
         <div className="max-w-[1400px] mx-auto p-4 sm:p-6 md:p-8">
           <LoadingSkeleton rows={8} height={50} />
         </div>
@@ -58,48 +57,47 @@ export default function Projections() {
   const rebP90 = rebalanced.p90[yIndex] / infl;
 
   return (
-    <div className="min-h-screen bg-[#080C14] text-[#EEF2FF] font-sans pb-16">
-
+    <div className="min-h-screen bg-slate-900 text-slate-50 font-sans pb-16">
       <div className="max-w-[1400px] mx-auto p-4 sm:p-6 md:p-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold">Return Projections</h1>
-            <p className="text-[#566580] text-sm mt-1">20-year probabilistic decay and performance modelling.</p>
+            <h1 className="text-2xl font-bold text-slate-50">Return Projections</h1>
+            <p className="text-slate-400 text-sm mt-1">20-year probabilistic decay and performance modelling.</p>
           </div>
           <div className="flex flex-wrap items-center gap-4 w-full md:w-auto justify-between md:justify-end">
             <label className="flex items-center gap-2 cursor-pointer">
-              <span className={`text-[12px] ${inflationAdjusted ? 'text-[#00E5B8]' : 'text-[#566580]'}`}>Inflation adjusted</span>
-              <input type="checkbox" checked={inflationAdjusted} onChange={() => setInflationAdjusted(!inflationAdjusted)} className="accent-[#00E5B8]" />
+              <span className={`text-xs ${inflationAdjusted ? 'text-blue-500' : 'text-slate-400'}`}>Inflation adjusted</span>
+              <input type="checkbox" checked={inflationAdjusted} onChange={() => setInflationAdjusted(!inflationAdjusted)} className="accent-blue-600" />
             </label>
-            <div className="bg-[#1A2235] rounded-lg border border-white/5 flex overflow-hidden">
+            <div className="bg-slate-800 rounded border border-slate-700 flex overflow-hidden">
               {[10, 20].map(y => (
                 <button 
                   key={y}
                   onClick={() => setSelectedYear(y)}
-                  className={`px-4 py-1.5 text-[12px] font-semibold transition-colors ${selectedYear === y ? 'bg-[#00E5B8] text-[#080C14]' : 'text-[#8A9BBF] hover:bg-white/5'}`}
+                  className={`px-4 py-1.5 text-xs font-semibold transition-colors ${selectedYear === y ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-700'}`}
                 >{y}Y</button>
               ))}
             </div>
-            <button className="bg-transparent border border-[#566580] text-[#EEF2FF] hover:bg-white/5 px-4 py-1.5 text-[12px] font-semibold rounded-lg transition-colors">Export</button>
+            <button className="bg-transparent border border-slate-600 text-slate-100 hover:bg-slate-700 px-4 py-1.5 text-xs font-semibold rounded transition-colors">Export</button>
           </div>
         </div>
 
         {/* Current Portfolio Chart Card */}
-        <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-8 shadow-xl">
+        <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm mb-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-            <h2 className="text-[#EEF2FF] font-semibold">Current Portfolio Projection</h2>
+            <h2 className="text-slate-100 font-semibold text-lg">Current Portfolio Projection</h2>
             <div className="flex flex-wrap gap-4 md:gap-6 justify-between w-full md:w-auto">
               <div className="flex flex-col items-end">
-                <span className="text-[10px] text-[#566580] font-bold uppercase tracking-wider">Median Year {selectedYear}</span>
-                <span className="text-[16px] text-[#00E5B8] font-bold">{formatINR(currentP50)}</span>
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Median Year {selectedYear}</span>
+                <span className="text-base text-blue-500 font-bold">{formatINR(currentP50)}</span>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-[10px] text-[#566580] font-bold uppercase tracking-wider">Worst Case</span>
-                <span className="text-[16px] text-[#FF4D4D] font-bold">{formatINR(currentP10)}</span>
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Worst Case</span>
+                <span className="text-base text-rose-500 font-bold">{formatINR(currentP10)}</span>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-[10px] text-[#566580] font-bold uppercase tracking-wider">Best Case</span>
-                <span className="text-[16px] text-[#22D3A5] font-bold">{formatINR(currentP90)}</span>
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Best Case</span>
+                <span className="text-base text-emerald-500 font-bold">{formatINR(currentP90)}</span>
               </div>
             </div>
           </div>
@@ -109,30 +107,30 @@ export default function Projections() {
         </div>
 
         {/* Alpha Delta Divider */}
-        <div className="flex items-center gap-4 my-2">
-          <div className="h-[1px] bg-white/5 flex-1"></div>
-          <div className="text-[12px] text-[#00E5B8] bg-[#00E5B8]/10 px-4 py-1.5 rounded-full border border-[#00E5B8]/20 font-bold tracking-wider whitespace-nowrap">
+        <div className="flex items-center gap-4 my-6">
+          <div className="h-px bg-slate-700 flex-1"></div>
+          <div className="text-xs text-blue-500 bg-blue-500/10 px-4 py-1.5 rounded-full border border-blue-500/20 font-bold tracking-wider whitespace-nowrap">
             {rebP50 - currentP50 >= 0 ? '+' : ''}{formatINR(rebP50 - currentP50)} ALPHA DELTA BY YEAR {selectedYear}
           </div>
-          <div className="h-[1px] bg-white/5 flex-1"></div>
+          <div className="h-px bg-slate-700 flex-1"></div>
         </div>
 
         {/* After Rebalancing Chart Card */}
-        <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-8 shadow-xl">
+        <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm mb-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-            <h2 className="text-[#EEF2FF] font-semibold">After Rebalancing</h2>
+            <h2 className="text-slate-100 font-semibold text-lg">After Rebalancing</h2>
             <div className="flex flex-wrap gap-4 md:gap-6 justify-between w-full md:w-auto">
               <div className="flex flex-col items-end">
-                <span className="text-[10px] text-[#566580] font-bold uppercase tracking-wider">Median Year {selectedYear}</span>
-                <span className="text-[16px] text-[#00E5B8] font-bold">{formatINR(rebP50)}</span>
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Median Year {selectedYear}</span>
+                <span className="text-base text-blue-500 font-bold">{formatINR(rebP50)}</span>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-[10px] text-[#566580] font-bold uppercase tracking-wider">Worst Case</span>
-                <span className="text-[16px] text-[#FF4D4D] font-bold">{formatINR(rebP10)}</span>
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Worst Case</span>
+                <span className="text-base text-rose-500 font-bold">{formatINR(rebP10)}</span>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-[10px] text-[#566580] font-bold uppercase tracking-wider">Best Case</span>
-                <span className="text-[16px] text-[#22D3A5] font-bold">{formatINR(rebP90)}</span>
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Best Case</span>
+                <span className="text-base text-emerald-500 font-bold">{formatINR(rebP90)}</span>
               </div>
             </div>
           </div>
@@ -142,25 +140,25 @@ export default function Projections() {
         </div>
 
         {/* Year Slider */}
-        <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-6 shadow-xl">
+        <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm">
           <div className="flex justify-between items-center mb-3">
-            <span className="text-[11px] text-[#566580] font-bold uppercase tracking-wider">Selected Horizon</span>
-            <span className="text-[13px] text-[#00E5B8] font-bold">Year {selectedYear}</span>
+            <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Selected Horizon</span>
+            <span className="text-sm text-blue-500 font-bold">Year {selectedYear}</span>
           </div>
           <input 
             type="range" min="1" max="20" step="1" 
             value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))}
-            className="w-full accent-[#00E5B8] h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer"
+            className="w-full accent-blue-600 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer"
           />
-          <div className="flex justify-between text-[11px] text-[#566580] mt-2 font-bold px-1">
+          <div className="flex justify-between text-xs text-slate-400 mt-2 font-bold px-1">
             <span>Y1</span><span>Y5</span><span>Y10</span><span>Y15</span><span>Y20</span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-6 shadow-lg">
-            <h3 className="text-[12px] uppercase tracking-widest text-[#00E5B8] font-bold mb-4">Assumptions</h3>
-            <ul className="text-[13px] text-[#8A9BBF] space-y-2 list-disc pl-4">
+          <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm">
+            <h3 className="text-xs uppercase tracking-widest text-blue-500 font-bold mb-4">Assumptions</h3>
+            <ul className="text-sm text-slate-400 space-y-2 list-disc pl-4">
               <li>Equity CAGR bounds: 10% (σ: 15%)</li>
               <li>Debt bounds: 7% (σ: 3%)</li>
               <li>Gold hedge proxy: 8.5% (σ: 12%)</li>
@@ -169,26 +167,26 @@ export default function Projections() {
             </ul>
           </div>
           
-          <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-6 shadow-lg">
-            <h3 className="text-[12px] uppercase tracking-widest text-[#00E5B8] font-bold mb-4">AI Summary</h3>
-            <ul className="text-[13px] text-[#8A9BBF] space-y-3 list-disc pl-4">
+          <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm">
+            <h3 className="text-xs uppercase tracking-widest text-blue-500 font-bold mb-4">AI Summary</h3>
+            <ul className="text-sm text-slate-400 space-y-3 list-disc pl-4">
               <li>The target asset allocation significantly compresses downside volatility limits.</li>
               <li>Removing Crypto ensures probability-zero out outcomes vanish prior to Year 7.</li>
               <li>Compounding alpha begins accelerating visibly past the 5-year mark vs the benchmark holding.</li>
             </ul>
           </div>
           
-          <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-6 shadow-lg">
-            <h3 className="text-[12px] uppercase tracking-widest text-[#00E5B8] font-bold mb-4">Milestone Probabilities</h3>
+          <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm">
+            <h3 className="text-xs uppercase tracking-widest text-blue-500 font-bold mb-4">Milestone Probabilities</h3>
             <div className="space-y-4">
               {milestones?.map((m, i) => (
                 <div key={i}>
-                  <div className="flex justify-between text-[11px] font-semibold text-[#EEF2FF] mb-1.5">
+                  <div className="flex justify-between text-xs font-semibold text-slate-100 mb-1.5">
                     <span>{m.label}</span>
-                    <span className="text-[#22D3A5]">{m.probRebalanced?.toFixed(1)}% <span className="text-[#566580] text-[10px] ml-1 font-normal">(was {m.probCurrent?.toFixed(1)}%)</span></span>
+                    <span className="text-emerald-500">{m.probRebalanced?.toFixed(1)}% <span className="text-slate-500 text-[10px] ml-1 font-normal">(was {m.probCurrent?.toFixed(1)}%)</span></span>
                   </div>
-                  <div className="h-[4px] w-full bg-[#1A2235] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#00E5B8] rounded-full" style={{ width: `${m.probRebalanced}%` }}></div>
+                  <div className="h-1 w-full bg-slate-700 rounded overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded transition-all duration-300" style={{ width: `${m.probRebalanced}%` }}></div>
                   </div>
                 </div>
               ))}

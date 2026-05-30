@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import StreamingText from '../shared/StreamingText';
+import { getBaseUrl } from '../../utils/api';
 
 const StreamingInsight = ({ userProfile, twinState, simulationResult }) => {
   const [text, setText] = useState('');
@@ -24,7 +25,7 @@ const StreamingInsight = ({ userProfile, twinState, simulationResult }) => {
     
     try {
       // Clean up base URL to handle trailing slashes
-      const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '');
+      const baseUrl = getBaseUrl();
       const apiUrl = `${baseUrl}/api/insight`;
 
       const response = await fetch(apiUrl, {
@@ -114,16 +115,16 @@ const StreamingInsight = ({ userProfile, twinState, simulationResult }) => {
   };
 
   return (
-    <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-6 shadow-xl flex flex-col h-full">
+    <div className="bg-slate-800 border border-slate-700 rounded p-6 shadow-sm flex flex-col h-full">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <span className="text-[#00E5B8] text-lg">✦</span>
-          <h2 className="text-[#EEF2FF] text-[14px] uppercase tracking-widest font-bold">AI Insight</h2>
+          <span className="text-blue-500 text-lg">✦</span>
+          <h2 className="text-slate-100 text-sm uppercase tracking-widest font-bold">AI Insight</h2>
         </div>
         {text.length > 0 && !isStreaming && (
           <button
             onClick={generateInsight}
-            className="text-[#566580] hover:text-[#00E5B8] text-[11px] font-semibold transition-colors"
+            className="text-slate-400 hover:text-blue-500 text-xs font-semibold transition-colors"
           >
             ↻ Regenerate
           </button>
@@ -132,18 +133,18 @@ const StreamingInsight = ({ userProfile, twinState, simulationResult }) => {
 
       {!simulationResult ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center">
-          <p className="text-[#8A9BBF] text-sm">Run a simulation to generate AI insights.</p>
+          <p className="text-slate-500 text-sm">Run a simulation to generate AI insights.</p>
         </div>
       ) : isStreaming || text.length > 0 ? (
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          <div className="flex-1 text-[#8A9BBF] text-[13px] leading-relaxed overflow-y-auto pr-2 custom-scrollbar">
+          <div className="flex-1 text-slate-300 text-sm leading-relaxed overflow-y-auto pr-2 custom-scrollbar">
             <StreamingText text={text} isStreaming={isStreaming} />
           </div>
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center text-center">
-          <div className="w-5 h-5 border-2 border-[#00E5B8] border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-[#566580] text-sm mt-3">Analyzing your scenario...</p>
+          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-slate-400 text-sm mt-3">Analyzing your scenario...</p>
         </div>
       )}
     </div>

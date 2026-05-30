@@ -67,34 +67,34 @@ export default function StructuredGoalsInput({ onScenarioReady, profile, isSimul
     handleSimulate();
   }, [activeTab]);
 
-  const labelStyle = "block text-[11px] uppercase tracking-wider text-[#566580] font-bold mb-1.5";
-  const inputStyle = "w-full bg-[#1A2235] border border-white/5 rounded-lg px-3 py-2 text-[13px] text-[#EEF2FF] outline-none focus:border-[#00E5B8]/50";
-  const inlineInfoStyle = "text-[11px] text-[#8A9BBF] mt-1.5 flex justify-between";
+  const labelStyle = "block text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1.5";
+  const inputStyle = "w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-xs text-slate-100 outline-none focus:border-blue-500/50";
+  const inlineInfoStyle = "text-[10px] text-slate-500 mt-1.5 flex justify-between";
 
   return (
-    <div className="bg-[#0F1520] border border-white/5 rounded-2xl p-5 shadow-xl flex flex-col gap-5">
+    <div className="bg-slate-800 border border-slate-700 rounded p-5 shadow-sm flex flex-col gap-5">
       <div>
-        <h3 className="text-[14px] font-semibold text-[#EEF2FF]">Structured Goals</h3>
-        <p className="text-[11px] text-[#566580] mt-0.5">Define your milestones mathematically</p>
+        <h3 className="text-sm font-semibold text-slate-100">Structured Goals</h3>
+        <p className="text-xs text-slate-400 mt-0.5">Define your milestones mathematically</p>
       </div>
 
       {/* Goal tabs */}
-      <div className="flex bg-[#161D2B] p-1 rounded-xl border border-white/5">
+      <div className="flex bg-slate-900 p-1 rounded border border-slate-700">
         <button
           onClick={() => setActiveTab('house')}
-          className={`flex-1 py-2 text-[11px] font-bold rounded-lg transition-colors ${activeTab === 'house' ? 'bg-[#00E5B8]/10 text-[#00E5B8] border border-[#00E5B8]/20' : 'text-[#8A9BBF] hover:text-[#EEF2FF] border border-transparent'}`}
+          className={`flex-1 py-2 text-xs font-bold rounded transition-colors ${activeTab === 'house' ? 'bg-blue-900/30 text-blue-500 border border-blue-500/30' : 'text-slate-400 hover:text-slate-200 border border-transparent'}`}
         >
           🏡 House
         </button>
         <button
           onClick={() => setActiveTab('retirement')}
-          className={`flex-1 py-2 text-[11px] font-bold rounded-lg transition-colors ${activeTab === 'retirement' ? 'bg-[#00E5B8]/10 text-[#00E5B8] border border-[#00E5B8]/20' : 'text-[#8A9BBF] hover:text-[#EEF2FF] border border-transparent'}`}
+          className={`flex-1 py-2 text-xs font-bold rounded transition-colors ${activeTab === 'retirement' ? 'bg-blue-900/30 text-blue-500 border border-blue-500/30' : 'text-slate-400 hover:text-slate-200 border border-transparent'}`}
         >
           🌅 FIRE
         </button>
         <button
           onClick={() => setActiveTab('education')}
-          className={`flex-1 py-2 text-[11px] font-bold rounded-lg transition-colors ${activeTab === 'education' ? 'bg-[#00E5B8]/10 text-[#00E5B8] border border-[#00E5B8]/20' : 'text-[#8A9BBF] hover:text-[#EEF2FF] border border-transparent'}`}
+          className={`flex-1 py-2 text-xs font-bold rounded transition-colors ${activeTab === 'education' ? 'bg-blue-900/30 text-blue-500 border border-blue-500/30' : 'text-slate-400 hover:text-slate-200 border border-transparent'}`}
         >
           🎓 Education
         </button>
@@ -109,7 +109,7 @@ export default function StructuredGoalsInput({ onScenarioReady, profile, isSimul
               <input 
                 type="range" min="1000000" max="100000000" step="500000" 
                 value={housePrice} onChange={e => setHousePrice(Number(e.target.value))}
-                className="w-full accent-[#00E5B8] h-1 bg-gray-800 rounded appearance-none"
+                className="w-full accent-blue-500 h-1 bg-slate-700 rounded"
               />
               <div className={inlineInfoStyle}>
                 <span>₹10L</span><span>₹5Cr</span><span>₹10Cr</span>
@@ -124,7 +124,7 @@ export default function StructuredGoalsInput({ onScenarioReady, profile, isSimul
                   value={downPaymentPct} onChange={e => setDownPaymentPct(Number(e.target.value))}
                   className={inputStyle}
                 />
-                <span className="text-[10px] text-[#566580] mt-1 block">Amt: {formatINR(downPayment)}</span>
+                <span className="text-[10px] text-slate-500 mt-1 block">Amt: {formatINR(downPayment)}</span>
               </div>
               <div>
                 <label className={labelStyle}>Loan Rate (% p.a.)</label>
@@ -155,21 +155,21 @@ export default function StructuredGoalsInput({ onScenarioReady, profile, isSimul
               </div>
             </div>
 
-            <div className="bg-[#141B28] rounded-xl p-3 border border-white/5 space-y-1">
-              <div className="flex justify-between text-[11px] text-[#8A9BBF]">
+            <div className="bg-slate-900 rounded p-3 border border-slate-700 space-y-1">
+              <div className="flex justify-between text-xs text-slate-400">
                 <span>Loan Principal:</span>
-                <span className="text-[#EEF2FF] font-semibold">{formatINR(loanAmount)}</span>
+                <span className="text-slate-100 font-semibold">{formatINR(loanAmount)}</span>
               </div>
-              <div className="flex justify-between text-[12px]">
-                <span className="text-[#8A9BBF] font-bold">Estimated Monthly EMI:</span>
-                <span className={`font-bold ${isEmiTooHigh ? 'text-[#FF4D4D]' : 'text-[#00E5B8]'}`}>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-400 font-bold">Estimated Monthly EMI:</span>
+                <span className={`font-bold ${isEmiTooHigh ? 'text-rose-500' : 'text-emerald-500'}`}>
                   {formatINR(calculatedEMI)}/mo
                 </span>
               </div>
             </div>
 
             {isEmiTooHigh && (
-              <div className="bg-[#FF4D4D]/10 border border-[#FF4D4D]/20 text-[#FF4D4D] text-[11px] p-3 rounded-lg leading-relaxed">
+              <div className="bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs p-3 rounded leading-relaxed">
                 ⚠️ **EMI Warning**: This EMI (₹{Math.round(calculatedEMI).toLocaleString('en-IN')}) exceeds 50% of your take-home monthly salary (₹{monthlyIncome.toLocaleString('en-IN')}). Consider increasing the down payment or lowering the budget.
               </div>
             )}
@@ -183,7 +183,7 @@ export default function StructuredGoalsInput({ onScenarioReady, profile, isSimul
               <input 
                 type="range" min="35" max="70" step="1" 
                 value={retirementAge} onChange={e => setRetirementAge(Number(e.target.value))}
-                className="w-full accent-[#00E5B8] h-1 bg-gray-800 rounded appearance-none"
+                className="w-full accent-blue-500 h-1 bg-slate-700 rounded"
               />
               <div className={inlineInfoStyle}>
                 <span>35</span><span>50</span><span>70</span>
@@ -197,21 +197,21 @@ export default function StructuredGoalsInput({ onScenarioReady, profile, isSimul
                 value={monthlyExpensesRet} onChange={e => setMonthlyExpensesRet(Number(e.target.value))}
                 className={inputStyle}
               />
-              <span className="text-[10px] text-[#566580] mt-1 block">Current monthly expenses: {formatINR(profile?.monthlyExpenses || profile?.expenses || 0)}</span>
+              <span className="text-[10px] text-slate-500 mt-1 block">Current monthly expenses: {formatINR(profile?.monthlyExpenses || profile?.expenses || 0)}</span>
             </div>
 
-            <div className="bg-[#141B28] rounded-xl p-3 border border-white/5">
-              <div className="flex justify-between text-[11px] text-[#8A9BBF] mb-1">
+            <div className="bg-slate-900 rounded p-3 border border-slate-700">
+              <div className="flex justify-between text-xs text-slate-400 mb-1">
                 <span>Years to Retirement:</span>
-                <span className="text-[#EEF2FF] font-semibold">{Math.max(0, retirementAge - (profile?.age || 30))} yrs</span>
+                <span className="text-slate-100 font-semibold">{Math.max(0, retirementAge - (profile?.age || 30))} yrs</span>
               </div>
-              <div className="flex justify-between text-[12px] pt-1 border-t border-white/5">
-                <span className="text-[#8A9BBF] font-bold">Target FIRE Corpus:</span>
-                <span className="text-[#8B7FFF] font-bold">
+              <div className="flex justify-between text-xs pt-1 border-t border-slate-800">
+                <span className="text-slate-400 font-bold">Target FIRE Corpus:</span>
+                <span className="text-blue-500 font-bold">
                   {formatINR(monthlyExpensesRet * 12 * 30)}
                 </span>
               </div>
-              <span className="text-[9px] text-[#566580] mt-1 block">Calculated via the 30x annual expenses rule</span>
+              <span className="text-[10px] text-slate-500 mt-1 block">Calculated via the 30x annual expenses rule</span>
             </div>
           </>
         )}
@@ -223,7 +223,7 @@ export default function StructuredGoalsInput({ onScenarioReady, profile, isSimul
               <input 
                 type="range" min="500000" max="20000000" step="250000" 
                 value={educationCost} onChange={e => setEducationCost(Number(e.target.value))}
-                className="w-full accent-[#00E5B8] h-1 bg-gray-800 rounded appearance-none"
+                className="w-full accent-blue-500 h-1 bg-slate-700 rounded"
               />
               <div className={inlineInfoStyle}>
                 <span>₹5L</span><span>₹1Cr</span><span>₹2Cr</span>
@@ -235,21 +235,21 @@ export default function StructuredGoalsInput({ onScenarioReady, profile, isSimul
               <input 
                 type="range" min="1" max="20" step="1" 
                 value={yearsRemaining} onChange={e => setYearsRemaining(Number(e.target.value))}
-                className="w-full accent-[#00E5B8] h-1 bg-gray-800 rounded appearance-none"
+                className="w-full accent-blue-500 h-1 bg-slate-700 rounded"
               />
               <div className={inlineInfoStyle}>
                 <span>1 yr</span><span>10 yrs</span><span>20 yrs</span>
               </div>
             </div>
 
-            <div className="bg-[#141B28] rounded-xl p-3 border border-white/5">
-              <div className="flex justify-between text-[11px] text-[#8A9BBF]">
+            <div className="bg-slate-900 rounded p-3 border border-slate-700">
+              <div className="flex justify-between text-xs text-slate-400">
                 <span>Future Target (unadjusted):</span>
-                <span className="text-[#EEF2FF] font-semibold">{formatINR(educationCost)}</span>
+                <span className="text-slate-100 font-semibold">{formatINR(educationCost)}</span>
               </div>
-              <div className="flex justify-between text-[12px] mt-1.5 pt-1.5 border-t border-white/5">
-                <span className="text-[#8A9BBF] font-bold">Education Infl. Cost (8%):</span>
-                <span className="text-[#22D3A5] font-bold">
+              <div className="flex justify-between text-xs mt-1.5 pt-1.5 border-t border-slate-800">
+                <span className="text-slate-400 font-bold">Education Infl. Cost (8%):</span>
+                <span className="text-emerald-500 font-bold">
                   {formatINR(educationCost * Math.pow(1.08, yearsRemaining))}
                 </span>
               </div>
@@ -261,10 +261,10 @@ export default function StructuredGoalsInput({ onScenarioReady, profile, isSimul
       <button
         onClick={handleSimulate}
         disabled={isSimulating}
-        className="w-full bg-[#00E5B8] hover:bg-[#00C29A] text-[#080C14] font-bold py-3.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-75"
+        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-75"
       >
         {isSimulating ? (
-          <div className="w-5 h-5 border-2 border-[#080C14] border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
         ) : (
           <>Run Math Simulation <span className="text-lg">→</span></>
         )}

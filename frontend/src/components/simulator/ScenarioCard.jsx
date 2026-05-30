@@ -12,21 +12,20 @@ const ScenarioCard = ({ scenario, isSelected, onSelect }) => {
   return (
     <div
       onClick={() => onSelect(scenario.key)}
-      className="cursor-pointer rounded-xl p-4 transition-all duration-200 flex items-center justify-between mb-3"
-      style={{
-        backgroundColor: isSelected ? 'rgba(0,229,184,0.08)' : '#1A2235',
-        border: isSelected ? '1px solid rgba(0,229,184,0.4)' : '1px solid rgba(255,255,255,0.06)',
-        borderLeft: isSelected ? '3px solid #00E5B8' : '1px solid rgba(255,255,255,0.06)'
-      }}
+      className={`cursor-pointer rounded p-4 transition-all duration-200 flex items-center justify-between mb-3 border ${
+        isSelected
+          ? 'bg-blue-900/20 border-blue-500/50 border-l-4 border-l-blue-500'
+          : 'bg-slate-800 border-slate-700'
+      }`}
     >
       <div className="flex items-center gap-4">
         <div className="text-2xl">{icon}</div>
         <div className="flex flex-col">
-          <span style={{ fontSize: '13px', fontWeight: 500, color: '#EEF2FF' }}>{scenario.name}</span>
-          <span style={{ fontSize: '12px', color: '#566580', marginTop: '2px' }}>{scenario.description}</span>
+          <span className="text-sm font-medium text-slate-100">{scenario.name}</span>
+          <span className="text-xs text-slate-500 mt-0.5">{scenario.description}</span>
         </div>
       </div>
-      <div style={{ color: '#566580' }}>→</div>
+      <div className="text-slate-500">→</div>
     </div>
   );
 };

@@ -1,38 +1,26 @@
 import React from 'react';
 
 const Badge = ({ type, label }) => {
-  const typeStyles = {
-    equity: { bg: 'rgba(139,127,255,0.15)', text: '#8B7FFF' },
-    debt: { bg: 'rgba(0,229,184,0.12)', text: '#00E5B8' },
-    gold: { bg: 'rgba(245,166,35,0.15)', text: '#F5A623' },
-    crypto: { bg: 'rgba(255,77,77,0.12)', text: '#FF4D4D' },
-    buy: { bg: 'rgba(34,211,165,0.15)', text: '#22D3A5' },
-    sell: { bg: 'rgba(255,77,77,0.12)', text: '#FF4D4D' },
-    optimal: { bg: 'rgba(34,211,165,0.12)', text: '#22D3A5' },
-    concentrated: { bg: 'rgba(245,166,35,0.15)', text: '#F5A623' },
-    overexposed: { bg: 'rgba(255,77,77,0.12)', text: '#FF4D4D' },
-    locked: { bg: 'rgba(245,166,35,0.12)', text: '#F5A623' },
-    excellent: { bg: 'rgba(34,211,165,0.12)', text: '#22D3A5' },
-    stable: { bg: 'rgba(0,229,184,0.1)', text: '#00E5B8' }
+  const typeClasses = {
+    equity: 'bg-blue-900/30 text-blue-400',
+    debt: 'bg-emerald-900/30 text-emerald-400',
+    gold: 'bg-amber-900/30 text-amber-400',
+    crypto: 'bg-rose-900/30 text-rose-400',
+    buy: 'bg-emerald-900/30 text-emerald-400',
+    sell: 'bg-rose-900/30 text-rose-400',
+    optimal: 'bg-emerald-900/30 text-emerald-400',
+    concentrated: 'bg-amber-900/30 text-amber-400',
+    overexposed: 'bg-rose-900/30 text-rose-400',
+    locked: 'bg-amber-900/30 text-amber-400',
+    excellent: 'bg-emerald-900/30 text-emerald-400',
+    stable: 'bg-emerald-900/30 text-emerald-400'
   };
 
-  const style = typeStyles[type?.toLowerCase()] || typeStyles.equity;
+  const cssClass = typeClasses[type?.toLowerCase()] || typeClasses.equity;
 
   return (
     <span
-      style={{
-        backgroundColor: style.bg,
-        color: style.text,
-        fontSize: '10px',
-        fontWeight: 700,
-        padding: '3px 10px',
-        borderRadius: '6px',
-        textTransform: 'uppercase',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        whiteSpace: 'nowrap'
-      }}
+      className={`text-[10px] font-bold px-2.5 py-1 rounded-md uppercase inline-flex items-center justify-center whitespace-nowrap ${cssClass}`}
     >
       {label || type}
     </span>
